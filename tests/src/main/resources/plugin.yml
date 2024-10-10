@@ -1,0 +1,15 @@
+main: me.nazarxexe.ui.testing.XeXeGuiPlugin
+name: XeXeGuiTestPlugin
+version: '69.420'
+description: Testing for xexegui
+load: POSTWORLD
+author: NazarbekAlda
+commands:
+  xexegui_test_basic:
+    permission: "xexegui.test"
+  xexegui_test_shimmer:
+   permission: "xexegui.test"
+  xexegui_test_progressbar:
+   permission: "xexegui.test"
+  xexegui_test_route:
+    permission: "xexegui.test"
