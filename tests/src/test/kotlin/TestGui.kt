@@ -1,6 +1,5 @@
 import be.seeseemelk.mockbukkit.MockBukkit
 import me.nazarxexe.ui.*
-import me.nazarxexe.ui.simmer.shimmer
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
