@@ -5,12 +5,6 @@ plugins {
 group = "me.nazarxexe"
 version = "1.0-SNAPSHOT"
 
-subprojects {
-    apply {
-        plugin("maven-publish")
-    }
-}
-
 repositories {
     mavenCentral()
 }

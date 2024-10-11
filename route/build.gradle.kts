@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    `maven-publish`
 }
 
 group = "me.nazarxexe"
@@ -16,6 +17,16 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
 
     testImplementation(kotlin("test"))
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            register("release", MavenPublication::class.java) {
+                from(components["kotlin"])
+            }
+        }
+    }
 }
 
 tasks.test {

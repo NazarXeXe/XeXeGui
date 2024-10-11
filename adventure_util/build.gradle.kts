@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.ir.backend.js.compile
 
 plugins {
     kotlin("jvm")
+    `maven-publish`
 }
 
 group = "me.nazarxexe.ui"
