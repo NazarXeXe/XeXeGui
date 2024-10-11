@@ -9,6 +9,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 private fun minimessage(parse: String): Component {
     return MiniMessage.miniMessage().deserialize(parse)
 }
+
 private fun minimessage(parse: String, vararg tagResolver: TagResolver): Component {
     return MiniMessage.miniMessage().deserialize(parse, *tagResolver)
 }
@@ -17,7 +18,7 @@ class ShimmerInternalState(
     scheduler: Scheduler,
     val curve: (Float) -> Float = LinearCurve,
     val timePerTick: Float = 0.05f
-): InternalGuiState<ShimmerState>(), ClosableState {
+) : InternalGuiState<ShimmerState>(), ClosableState {
 
     var state: ShimmerState = ShimmerState(curve(0f))
         set(value) {
@@ -59,6 +60,7 @@ data class ShimmerState(private val shift: Float) {
         val raw = colors.reduce { a, b -> "$a:$b:" }
         return minimessage("<gradient:$raw$shift>$content</gradient>")
     }
+
     fun applyTo(
         content: Component,
         colors: List<String> = listOf("#fefffc", "#bcbdbb"),

@@ -9,10 +9,9 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
-class RouteCommandTest(val guiHandler: GuiHandler): CommandExecutor {
+class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
         if (sender !is Player) return false
 

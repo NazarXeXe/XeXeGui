@@ -4,7 +4,7 @@ import me.nazarxexe.ui.Gui
 import me.nazarxexe.ui.GuiHandler
 import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryType
-import java.util.UUID
+import java.util.*
 
 class Route(
     val guiHandler: GuiHandler,
@@ -13,7 +13,7 @@ class Route(
 
     val map = mutableMapOf<String, RoutedGui>() // Map literally
 
-    fun gui(path: String, slots: Int = InventoryType.CHEST.defaultSize,  builder: Gui.(Route) -> Unit) {
+    fun gui(path: String, slots: Int = InventoryType.CHEST.defaultSize, builder: Gui.(Route) -> Unit) {
         map[path] = RoutedGui(slots, this, builder)
     }
 

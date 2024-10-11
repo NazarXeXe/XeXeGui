@@ -8,8 +8,8 @@ commands:
   xexegui_test_basic:
     permission: "xexegui.test"
   xexegui_test_shimmer:
-   permission: "xexegui.test"
+    permission: "xexegui.test"
   xexegui_test_progressbar:
-   permission: "xexegui.test"
+    permission: "xexegui.test"
   xexegui_test_route:
     permission: "xexegui.test"

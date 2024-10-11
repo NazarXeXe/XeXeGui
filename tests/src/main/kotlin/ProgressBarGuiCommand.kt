@@ -6,8 +6,6 @@ import me.nazarxexe.ui.component
 import me.nazarxexe.ui.gui
 import me.nazarxexe.ui.progressbar.progressBar
 import me.nazarxexe.ui.shimmer.shimmer
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -17,15 +15,16 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 
-class ProgressBarGuiCommand(val scheduler: Scheduler): CommandExecutor {
+class ProgressBarGuiCommand(val scheduler: Scheduler) : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
         if (sender !is Player) return false
 
         val theGui = gui(InventoryType.CHEST.defaultSize) {
             val progressBar = progressBar()
+            val shimmer = shimmer(scheduler, timePerTick = 0.1f)
             component(0) {
                 var progress by hook(progressBar)
-                val shimmer = shimmer(scheduler)
+                val theShimmer by hook(shimmer)
 
                 click {
                     it.isCancelled = true
@@ -39,7 +38,6 @@ class ProgressBarGuiCommand(val scheduler: Scheduler): CommandExecutor {
                 }
                 render {
                     val item = ItemStack(Material.STONE)
-                    val theShimmer by hook(shimmer)
                     val meta = item.itemMeta!!
 
                     meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(progressBar.make(

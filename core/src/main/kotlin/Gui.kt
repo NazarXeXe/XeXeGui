@@ -2,13 +2,9 @@ package me.nazarxexe.ui
 
 import org.bukkit.Bukkit
 import org.bukkit.entity.HumanEntity
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryEvent
-import org.bukkit.event.inventory.InventoryOpenEvent
-import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.inventory.*
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
+import java.util.*
 
 fun interface GuiComposable {
     fun react(e: InventoryEvent)
@@ -20,6 +16,7 @@ class Gui(val slots: Int) {
     fun raw(): Array<ItemStack> {
         return inventory.contents
     }
+
     fun viewers(): List<HumanEntity> {
         return inventory.viewers
     }
@@ -57,7 +54,7 @@ class Gui(val slots: Int) {
 
 @Suppress("warnings")
 inline fun Gui.compose(e: GuiComposable) {
-    guiComposable.add( e )
+    guiComposable.add(e)
 }
 
 inline fun Gui.open(crossinline impl: (e: InventoryOpenEvent) -> Unit) {
@@ -91,6 +88,7 @@ open class GuiState<T>(private var default: T) {
     open fun value(): T {
         return default
     }
+
     open fun value(newValue: T) {
         default = newValue
         hooks.forEach { it.signal() }
@@ -98,7 +96,7 @@ open class GuiState<T>(private var default: T) {
         return
     }
 
-    val hooks = mutableListOf< ComponentState<*> >()
+    val hooks = mutableListOf<ComponentState<*>>()
 }
 
 /**
@@ -107,7 +105,7 @@ open class GuiState<T>(private var default: T) {
 abstract class InternalGuiState<T> {
     abstract fun value(): T
 
-    val hooks = mutableListOf< ComponentState<*> >()
+    val hooks = mutableListOf<ComponentState<*>>()
 }
 
 interface ClosableState {

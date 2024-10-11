@@ -2,13 +2,11 @@ package me.nazarxexe.ui
 
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryEvent
 import org.bukkit.inventory.ItemStack
-import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-abstract class ComponentState<T>: ReadWriteProperty<Any?, T> {
+abstract class ComponentState<T> : ReadWriteProperty<Any?, T> {
     var signal: () -> Unit = {}
         internal set
 }
@@ -51,6 +49,7 @@ class GuiComponentBuilder(val slot: Int) {
         stateList.add(state)
         return state
     }
+
     fun <T> hook(state: GuiState<T>): ComponentState<T> {
         val theState = object : ComponentState<T>() {
             override fun getValue(thisRef: Any?, property: KProperty<*>): T = state.value()
@@ -63,6 +62,7 @@ class GuiComponentBuilder(val slot: Int) {
         state.hooks.add(theState)
         return theState
     }
+
     fun <T> hook(state: InternalGuiState<T>): ComponentState<T> {
         val theState = object : ComponentState<T>() {
             override fun getValue(thisRef: Any?, property: KProperty<*>): T = state.value()
@@ -84,6 +84,7 @@ class GuiComponentBuilder(val slot: Int) {
     fun composable(composable: GuiComposable) {
         composableList.add(composable)
     }
+
     fun button(button: (e: InventoryClickEvent) -> Unit) {
         composable {
             if (it !is InventoryClickEvent) return@composable
@@ -105,8 +106,7 @@ class GuiComponentBuilder(val slot: Int) {
 }
 
 
-
-inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> Unit ) {
+inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> Unit) {
     val builder = GuiComponentBuilder(slot)
     impl(builder)
     val build = builder.build()
@@ -115,7 +115,7 @@ inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> 
     component(slot, build)
 }
 
-inline fun Gui.component( slot: Int, component: GuiComponent ) {
+inline fun Gui.component(slot: Int, component: GuiComponent) {
     component.changeSignal(createSignal(slot, component))
     component.signal()
 }

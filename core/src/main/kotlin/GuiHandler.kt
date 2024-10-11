@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.Inventory
 
-open class GuiHandler: Listener {
+open class GuiHandler : Listener {
 
     val list = mutableListOf<Gui>()
 
