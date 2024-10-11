@@ -9,16 +9,6 @@ subprojects {
     apply {
         plugin("maven-publish")
     }
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                groupId = this@subprojects.group as String
-                artifactId = this@subprojects.name
-                version = this@subprojects.version as String
-            }
-        }
-    }
-
 }
 
 repositories {
