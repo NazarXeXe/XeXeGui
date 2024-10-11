@@ -19,15 +19,6 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            register("release", MavenPublication::class.java) {
-                from(components["kotlin"])
-            }
-        }
-    }
-}
 
 tasks.test {
     useJUnitPlatform()
