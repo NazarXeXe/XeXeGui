@@ -5,14 +5,27 @@ plugins {
 group = "me.nazarxexe"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-
+subprojects {
+    apply {
+        plugin("maven-publish")
+    }
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                groupId = this@subprojects.group as String
+                artifactId = this@subprojects.name
+                version = this@subprojects.version as String
+            }
+        }
+    }
 
 }
 
-dependencies {
+repositories {
+    mavenCentral()
+}
 
+dependencies {
     testImplementation(kotlin("test"))
 }
 

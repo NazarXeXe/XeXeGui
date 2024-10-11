@@ -4,8 +4,8 @@ plugins {
     kotlin("jvm")
 }
 
-group = "me.nazarxexe"
-version = "1.0-SNAPSHOT"
+group = "me.nazarxexe.ui"
+version = "1.0"
 
 repositories {
     mavenCentral()
