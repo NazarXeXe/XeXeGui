@@ -27,7 +27,7 @@ class Gui(val slots: Int) {
 
     val signalMap = mutableMapOf<Int, () -> Unit>()
 
-    fun <T> state(default: T): GuiState<T> {
+    fun <T> guiState(default: T): GuiState<T> {
         return GuiState(default)
     }
 

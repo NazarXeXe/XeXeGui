@@ -20,7 +20,7 @@ class TestGui {
         )
 
         val theGui = gui(InventoryType.CHEST.defaultSize) {
-            val rizz = state(1000)
+            val rizz = guiState(1000)
             click {
                 it.isCancelled = true
             }
