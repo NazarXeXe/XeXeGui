@@ -6,7 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryType
 import java.util.*
 
-class Route(
+open class Route(
     val guiHandler: GuiHandler,
     val player: UUID
 ) {
