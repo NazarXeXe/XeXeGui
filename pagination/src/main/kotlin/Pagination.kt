@@ -25,6 +25,7 @@ open class Pagination(val reserve: Set<Int>, gui: Gui) {
     open fun getPageAt(page: Int): Page? {
         return pages[page]
     }
+
     open fun getCurrentPage(): Page? {
         return pages[currentPage]
     }
@@ -72,12 +73,13 @@ class Page(val parent: Pagination) {
 
     fun set(slot: Int, component: GuiComponent) {
         if (!parent.reserve.contains(slot)) error("Out of bounds.")
-        components[slot]?.changeSignal {  }
+        components[slot]?.changeSignal { }
         components[slot] = component
         update()
     }
 
     internal fun update() {
+        if (parent.getPageAt(currentSlot) == null) return
         if (currentSlot == parent.currentPage) parent.update()
     }
 
@@ -87,10 +89,10 @@ class Page(val parent: Pagination) {
 
 }
 
-class PaginationComponent: GuiComponent() {
+class PaginationComponent : GuiComponent() {
     var child: GuiComponent? = null
         set(value) {
-            field?.changeSignal {  }
+            field?.changeSignal { }
             value?.changeSignal(this.signal)
             field = value
         }
@@ -104,6 +106,7 @@ class PaginationComponent: GuiComponent() {
 fun Gui.pagination(reserve: Set<Int>): Pagination {
     return Pagination(reserve, this)
 }
+
 fun Gui.pagination(reserve: IntRange): Pagination {
     return Pagination(reserve.toSet(), this)
 }

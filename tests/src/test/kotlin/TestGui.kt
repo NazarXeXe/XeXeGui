@@ -1,5 +1,6 @@
 import be.seeseemelk.mockbukkit.MockBukkit
 import me.nazarxexe.ui.*
+import me.nazarxexe.ui.pagination.pagination
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
@@ -20,6 +21,7 @@ class TestGui {
         )
 
         val theGui = gui(InventoryType.CHEST.defaultSize) {
+
             val rizz = guiState(1000)
             click {
                 it.isCancelled = true
