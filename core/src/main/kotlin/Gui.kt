@@ -111,3 +111,17 @@ abstract class InternalGuiState<T> {
 interface ClosableState {
     fun close()
 }
+
+inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> Unit) {
+    val builder = GuiComponentBuilder(slot)
+    impl(builder)
+    val build = builder.build()
+    guiComposable.addAll(build.composable)
+
+    component(slot, build)
+}
+
+inline fun Gui.component(slot: Int, component: GuiComponent) {
+    component.changeSignal(createSignal(slot, component))
+    component.signal()
+}

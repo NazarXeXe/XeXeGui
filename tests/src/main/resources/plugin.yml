@@ -13,3 +13,5 @@ commands:
     permission: "xexegui.test"
   xexegui_test_route:
     permission: "xexegui.test"
+  xexegui_test_pagination:
+    permission: "xexegui.test"

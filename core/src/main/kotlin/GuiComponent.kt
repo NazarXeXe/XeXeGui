@@ -12,7 +12,7 @@ abstract class ComponentState<T> : ReadWriteProperty<Any?, T> {
 }
 
 abstract class GuiComponent(
-    private var signal: () -> Unit = {},
+    protected var signal: () -> Unit = {},
     val composable: List<GuiComposable> = listOf(),
     val states: List<ComponentState<*>> = listOf()
 ) {
@@ -30,7 +30,7 @@ abstract class GuiComponent(
 
 }
 
-class GuiComponentBuilder(val slot: Int) {
+class GuiComponentBuilder(val slot: Int?) {
 
     private var render: () -> ItemStack = { ItemStack(Material.AIR) }
     private var stateList = mutableListOf<ComponentState<*>>()
@@ -86,6 +86,7 @@ class GuiComponentBuilder(val slot: Int) {
     }
 
     fun button(button: (e: InventoryClickEvent) -> Unit) {
+        if (slot == null) error("Button slot isn't defined.")
         composable {
             if (it !is InventoryClickEvent) return@composable
             if (it.slot != slot) return@composable
@@ -105,17 +106,8 @@ class GuiComponentBuilder(val slot: Int) {
     }
 }
 
-
-inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> Unit) {
+inline fun component(slot: Int? = null, crossinline impl: GuiComponentBuilder.() -> Unit): GuiComponent {
     val builder = GuiComponentBuilder(slot)
     impl(builder)
-    val build = builder.build()
-    guiComposable.addAll(build.composable)
-
-    component(slot, build)
-}
-
-inline fun Gui.component(slot: Int, component: GuiComponent) {
-    component.changeSignal(createSignal(slot, component))
-    component.signal()
+    return builder.build()
 }

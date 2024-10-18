@@ -18,6 +18,7 @@ dependencies {
     api(project(":core"))
     api(project(":adventure_util"))
     api(project(":route"))
+    api(project(":pagination"))
     implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
 
