@@ -49,6 +49,7 @@ open class Pagination(val reserve: Set<Int>, gui: Gui) {
             it.value.signal()
             currentComposable.addAll(it.value.composable)
         }
+        paginationComponents.forEach { it.value.signal() }
     }
 
 
