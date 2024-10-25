@@ -2,21 +2,12 @@ package me.nazarxexe.ui.shimmer
 
 import me.nazarxexe.ui.*
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
-private fun minimessage(parse: String): Component {
-    return MiniMessage.miniMessage().deserialize(parse)
-}
-
-private fun minimessage(parse: String, vararg tagResolver: TagResolver): Component {
-    return MiniMessage.miniMessage().deserialize(parse, *tagResolver)
-}
 
 class ShimmerInternalState(
     scheduler: Scheduler,
-    val curve: (Float) -> Float = LinearCurve,
+    val curve: (Float) -> Float = Interp,
     val timePerTick: Float = 0.05f
 ) : InternalGuiState<ShimmerState>(), ClosableState {
 
@@ -71,14 +62,11 @@ data class ShimmerState(private val shift: Float) {
         return minimessage("<gradient:$raw$shift><content></gradient>", tag)
     }
 
-    operator fun plus(other: Float): ShimmerState {
-        return ShimmerState(other + shift)
-    }
 
 }
 
 fun Gui.shimmer(scheduler: Scheduler, timePerTick: Float = 0.05f): ShimmerInternalState {
-    return shimmer(scheduler, LinearCurve, timePerTick)
+    return shimmer(scheduler, Interp, timePerTick)
 }
 
 fun Gui.shimmer(scheduler: Scheduler, curve: (Float) -> Float, timePerTick: Float = 0.05f): ShimmerInternalState {

@@ -7,7 +7,7 @@ author: NazarbekAlda
 commands:
   xexegui_test_basic:
     permission: "xexegui.test"
-  xexegui_test_shimmer:
+  xexegui_test_adv:
     permission: "xexegui.test"
   xexegui_test_progressbar:
     permission: "xexegui.test"

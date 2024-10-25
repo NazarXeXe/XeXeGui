@@ -23,7 +23,7 @@ class XeXeGuiPlugin : JavaPlugin() {
                 return server.scheduler.runTaskTimer(this@XeXeGuiPlugin, runnable, 0, repeat.toLong())
             }
         }
-        register("xexegui_test_shimmer", ShimmerGuiCommand(shedul))
+        register("xexegui_test_adv", AdventureUtilTest(shedul))
         register("xexegui_test_basic", BasicGuiCommand())
         register("xexegui_test_progressbar", ProgressBarGuiCommand(shedul))
         register("xexegui_test_route", RouteCommandTest(GuiHandle))
