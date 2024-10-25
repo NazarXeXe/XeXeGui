@@ -30,13 +30,13 @@ abstract class GuiComponent(
 
 }
 
-class GuiComponentBuilder(val slot: Int?) {
+open class GuiComponentBuilder(val slot: Int?) {
 
-    private var render: () -> ItemStack = { ItemStack(Material.AIR) }
-    private var stateList = mutableListOf<ComponentState<*>>()
-    private var composableList = mutableListOf<GuiComposable>()
+    protected var render: () -> ItemStack = { ItemStack(Material.AIR) }
+    protected var stateList = mutableListOf<ComponentState<*>>()
+    protected var composableList = mutableListOf<GuiComposable>()
 
-    fun <T> state(default: T): ReadWriteProperty<Any?, T> {
+    open fun <T> state(default: T): ReadWriteProperty<Any?, T> {
         val state = object : ComponentState<T>() {
             var v: T = default
             override fun getValue(thisRef: Any?, property: KProperty<*>): T = v
@@ -50,7 +50,7 @@ class GuiComponentBuilder(val slot: Int?) {
         return state
     }
 
-    fun <T> hook(state: GuiState<T>): ComponentState<T> {
+    open fun <T> hook(state: GuiState<T>): ComponentState<T> {
         val theState = object : ComponentState<T>() {
             override fun getValue(thisRef: Any?, property: KProperty<*>): T = state.value()
 
@@ -63,7 +63,7 @@ class GuiComponentBuilder(val slot: Int?) {
         return theState
     }
 
-    fun <T> hook(state: InternalGuiState<T>): ComponentState<T> {
+    open fun <T> hook(state: InternalGuiState<T>): ComponentState<T> {
         val theState = object : ComponentState<T>() {
             override fun getValue(thisRef: Any?, property: KProperty<*>): T = state.value()
 
@@ -77,15 +77,15 @@ class GuiComponentBuilder(val slot: Int?) {
     }
 
 
-    fun render(impl: () -> ItemStack) {
+    open fun render(impl: () -> ItemStack) {
         render = impl
     }
 
-    fun composable(composable: GuiComposable) {
+    open fun composable(composable: GuiComposable) {
         composableList.add(composable)
     }
 
-    fun button(button: (e: InventoryClickEvent) -> Unit) {
+    open fun button(button: (e: InventoryClickEvent) -> Unit) {
         if (slot == null) error("Button slot isn't defined.")
         composable {
             if (it !is InventoryClickEvent) return@composable
@@ -94,7 +94,7 @@ class GuiComponentBuilder(val slot: Int?) {
         }
     }
 
-    fun build(): GuiComponent {
+    open fun build(): GuiComponent {
         return object : GuiComponent(
             composable = composableList,
             states = stateList

@@ -4,7 +4,7 @@ import me.nazarxexe.ui.*
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-open class Pagination(val reserve: Set<Int>, gui: Gui) {
+open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Pagination>() {
 
     val pages = mutableMapOf<Int, Page>()
     protected val currentComposable = mutableListOf<GuiComposable>()
@@ -36,6 +36,7 @@ open class Pagination(val reserve: Set<Int>, gui: Gui) {
     open fun changePage(to: Int) {
         currentPage = to
         update()
+        hooks.forEach { it.signal() }
     }
 
     open fun update() {
@@ -64,6 +65,10 @@ open class Pagination(val reserve: Set<Int>, gui: Gui) {
         gui.compose { e ->
             currentComposable.forEach { it.react(e) }
         }
+    }
+
+    override fun value(): Pagination {
+        return this
     }
 
 }

@@ -15,3 +15,5 @@ commands:
     permission: "xexegui.test"
   xexegui_test_pagination:
     permission: "xexegui.test"
+  xexegui_test_suspense:
+    permission: "xexegui.test"

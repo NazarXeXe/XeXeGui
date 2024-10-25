@@ -19,9 +19,13 @@ dependencies {
     api(project(":adventure_util"))
     api(project(":route"))
     api(project(":pagination"))
-
+    api(project(":coroutine"))
     implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
+    implementation("io.ktor:ktor-client-cio-jvm:3.0.0")
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
+
+    implementation("io.ktor:ktor-client-core:3.0.0")
+    implementation("io.ktor:ktor-client-cio:3.0.0")
 
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.131.0")
 

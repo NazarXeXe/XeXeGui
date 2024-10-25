@@ -10,14 +10,14 @@ fun interface GuiComposable {
     fun react(e: InventoryEvent)
 }
 
-class Gui(val slots: Int) {
+open class Gui(val slots: Int) {
     internal val inventory = Bukkit.createInventory(null, slots)
 
-    fun raw(): Array<ItemStack> {
+    open fun raw(): Array<ItemStack> {
         return inventory.contents
     }
 
-    fun viewers(): List<HumanEntity> {
+    open fun viewers(): List<HumanEntity> {
         return inventory.viewers
     }
 
@@ -26,10 +26,6 @@ class Gui(val slots: Int) {
     val guiComposable = mutableListOf<GuiComposable>()
 
     val signalMap = mutableMapOf<Int, () -> Unit>()
-
-    fun <T> guiState(default: T): GuiState<T> {
-        return GuiState(default)
-    }
 
     open fun createSignal(slot: Int, component: GuiComponent): () -> Unit {
         if (slot < 0 || slot >= slots) error("Out of bounds.")
@@ -98,6 +94,9 @@ open class GuiState<T>(private var default: T) {
 
     val hooks = mutableListOf<ComponentState<*>>()
 }
+fun <T> Gui.guiState(default: T): GuiState<T> {
+    return GuiState(default)
+}
 
 /**
  * Aka read only.
@@ -121,7 +120,8 @@ inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> 
     component(slot, build)
 }
 
-inline fun Gui.component(slot: Int, component: GuiComponent) {
+fun Gui.component(slot: Int, component: GuiComponent) {
     component.changeSignal(createSignal(slot, component))
+
     component.signal()
 }
