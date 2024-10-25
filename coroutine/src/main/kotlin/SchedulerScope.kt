@@ -1,3 +1,5 @@
+package me.nazarxexe.ui.async
+
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Runnable
 import me.nazarxexe.ui.Scheduler

@@ -9,7 +9,6 @@ version = "1.0"
 
 repositories {
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
 
 }
@@ -27,7 +26,6 @@ dependencies {
     implementation("io.ktor:ktor-client-core:3.0.0")
     implementation("io.ktor:ktor-client-cio:3.0.0")
 
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.131.0")
 
     testImplementation(kotlin("test"))
 }

@@ -1,6 +1,7 @@
 package me.nazarxexe.ui.testing
 
-import asyncGui
+import me.nazarxexe.ui.async.asyncGui
+import me.nazarxexe.ui.async.suspense
 import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -17,7 +18,6 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import suspense
 
 class AsyncGuiTestCommand(val scheduler: Scheduler) : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {

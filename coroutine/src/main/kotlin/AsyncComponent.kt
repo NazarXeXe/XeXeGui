@@ -1,3 +1,5 @@
+package me.nazarxexe.ui.async
+
 import kotlinx.coroutines.*
 import me.nazarxexe.ui.*
 import org.bukkit.Material

@@ -1,3 +1,5 @@
+package me.nazarxexe.ui.async
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import me.nazarxexe.ui.Gui
