@@ -36,7 +36,6 @@ class PulseState(val shift: Float) {
     fun color(
         color: TextColor,
     ): TextColor {
-        println(shift)
         val darker = TextColor.color(color.red() * 1/2, color.green() * 1/2, color.blue() * 1/2)
         return TextColor.lerp(shift, color, darker)
     }
