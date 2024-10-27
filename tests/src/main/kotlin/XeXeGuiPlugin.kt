@@ -29,5 +29,6 @@ class XeXeGuiPlugin : JavaPlugin() {
         register("xexegui_test_route", RouteCommandTest(GuiHandle))
         register("xexegui_test_pagination", PaginationTestCommand())
         register("xexegui_test_suspense", AsyncGuiTestCommand(shedul))
+        register("xexegui_test_placeholderapi", PlaceholderAPITestCommand(shedul))
     }
 }

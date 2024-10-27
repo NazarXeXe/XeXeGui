@@ -19,12 +19,14 @@ dependencies {
     api(project(":route"))
     api(project(":pagination"))
     api(project(":coroutine"))
+    api(project(":placeholderapi"))
     implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
     implementation("io.ktor:ktor-client-cio-jvm:3.0.0")
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
 
     implementation("io.ktor:ktor-client-core:3.0.0")
     implementation("io.ktor:ktor-client-cio:3.0.0")
+    implementation("com.google.code.gson:gson:2.11.0")
 
 
     testImplementation(kotlin("test"))

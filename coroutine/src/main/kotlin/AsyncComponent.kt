@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import me.nazarxexe.ui.*
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import kotlin.coroutines.CoroutineContext
 
 class Suspense(val slot: Int? = null, val mainScope: CoroutineScope, val asyncScope: CoroutineScope) {
 
@@ -72,11 +71,7 @@ inline fun Gui.suspense(slot: Int, mainScope: CoroutineScope, asyncScope: Corout
     guiComposable.addAll(c.composable)
 }
 inline fun Gui.suspense(slot: Int, mainScope: Scheduler, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit) {
-    val suspense = Suspense(slot, CoroutineScope(object : CoroutineDispatcher() {
-        override fun dispatch(context: CoroutineContext, block: Runnable) {
-            mainScope.run { block.run() }
-        }
-    }), asyncScope)
+    val suspense = Suspense(slot, CoroutineScope(SchedulerScope(mainScope)), asyncScope)
     impl(suspense)
     val c = suspense.make()
     component(slot, c)

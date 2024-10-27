@@ -1,8 +1,6 @@
 package me.nazarxexe.ui.pulse
 
 import me.nazarxexe.ui.*
-import me.nazarxexe.ui.shimmer.ShimmerInternalState
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import kotlin.math.sin
 
@@ -36,7 +34,7 @@ class PulseState(val shift: Float) {
     fun color(
         color: TextColor,
     ): TextColor {
-        val darker = TextColor.color(color.red() * 1/2, color.green() * 1/2, color.blue() * 1/2)
+        val darker = TextColor.color(color.red() * 3/4, color.green() * 3/4, color.blue() * 3/4)
         return TextColor.lerp(shift, color, darker)
     }
 }

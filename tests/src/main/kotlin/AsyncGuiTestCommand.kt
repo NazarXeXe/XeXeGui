@@ -1,8 +1,8 @@
 package me.nazarxexe.ui.testing
 
+import com.google.gson.Gson
 import me.nazarxexe.ui.async.asyncGui
 import me.nazarxexe.ui.async.suspense
-import com.google.gson.Gson
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*

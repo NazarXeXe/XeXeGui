@@ -4,7 +4,7 @@ import me.nazarxexe.ui.Gui
 import me.nazarxexe.ui.GuiState
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
-import kotlin.math.ceil
+import kotlin.math.floor
 
 private fun mul(str: String, times: Int): String {
     var result = ""
@@ -22,7 +22,7 @@ class ProgressBarState(progress: Float = 0f) : GuiState<Float>(progress) {
         empty: String = "-",
         size: Int = 10,
     ): Component {
-        val fillingCount = ceil(value() * size).toInt()
+        val fillingCount = floor(   value() * size).toInt()
         val fillingComponent = fillingStyle(Component.text(mul(filling, fillingCount)))
         val emptyComponent = emptyStyle(Component.text(mul(empty, size - fillingCount)))
         return fillingComponent.append(emptyComponent)
