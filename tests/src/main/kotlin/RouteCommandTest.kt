@@ -44,7 +44,7 @@ class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
                     render {
                         val item = ItemStack(Material.STONE)
                         val meta = item.itemMeta!!
-                        meta.setDisplayName("I'm at 2st gui.")
+                        meta.setDisplayName("I'm at 2nd gui.")
                         item.itemMeta = meta
                         item
                     }
