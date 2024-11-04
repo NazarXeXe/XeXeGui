@@ -22,7 +22,7 @@ open class GuiHandler : Listener {
     }
 
     @EventHandler
-    fun open(e: InventoryOpenEvent) {
+    open fun open(e: InventoryOpenEvent) {
         val inv = find(e.inventory) ?: return
         for (guiComposable in inv.guiComposable) {
             guiComposable.react(e)
@@ -30,7 +30,7 @@ open class GuiHandler : Listener {
     }
 
     @EventHandler
-    fun click(e: InventoryClickEvent) {
+    open fun click(e: InventoryClickEvent) {
         val inv = find(e.inventory) ?: return
         for (guiComposable in inv.guiComposable) {
             guiComposable.react(e)
@@ -38,7 +38,7 @@ open class GuiHandler : Listener {
     }
 
     @EventHandler
-    fun close(e: InventoryCloseEvent) {
+    open fun close(e: InventoryCloseEvent) {
         val inv = find(e.inventory) ?: return
         for (guiComposable in inv.guiComposable) {
             guiComposable.react(e)
@@ -49,7 +49,7 @@ open class GuiHandler : Listener {
     }
 
 
-    fun openTo(player: Player, gui: Gui) {
+    open fun openTo(player: Player, gui: Gui) {
         list.add(gui)
         player.openInventory(gui.inventory)
     }
