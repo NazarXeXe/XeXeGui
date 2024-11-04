@@ -49,6 +49,11 @@ class AdventureUtilTest(val scheduler: Scheduler) : CommandExecutor {
                             Component.text("PULSEEEEEE").color(myPulse.color(NamedTextColor.WHITE))
                         )
                     )
+                    mat.lore = listOf(
+                        LegacyComponentSerializer.legacySection().serialize(
+                            myPulse.applyTo(minimessage("<rainbow>Colorful pulsed.")).asComponent()
+                        )
+                    )
                     item.itemMeta = mat
                     item
                 }
@@ -78,8 +83,8 @@ class AdventureUtilTest(val scheduler: Scheduler) : CommandExecutor {
                     if (it !is InventoryCloseEvent) return@compose
                     task.cancel()
                 }
-
             }
+
 
 
         }

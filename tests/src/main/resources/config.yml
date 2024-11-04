@@ -1,0 +1,18 @@
+
+gui:
+  states:
+    uistate: #
+      {}
+  components:
+    '1': # slot
+      extends: "base" # component type
+      states:
+        somestate:
+          hooks: "uistate"
+      render:
+        material: dirt
+        meta:
+          displayName: "<green>Hi"
+          lore:
+            - "Mate"
+

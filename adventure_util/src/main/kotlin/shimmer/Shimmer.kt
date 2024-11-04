@@ -2,6 +2,7 @@ package me.nazarxexe.ui.shimmer
 
 import me.nazarxexe.ui.*
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
 
@@ -53,7 +54,7 @@ data class ShimmerState(private val shift: Float) {
     }
 
     fun applyTo(
-        content: Component,
+        content: ComponentLike,
         colors: List<String> = listOf("#fefffc", "#bcbdbb"),
     ): Component {
         val raw = colors.reduce { a, b -> "$a:$b:" }

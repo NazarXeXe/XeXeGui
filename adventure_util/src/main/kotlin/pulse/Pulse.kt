@@ -1,6 +1,9 @@
 package me.nazarxexe.ui.pulse
 
 import me.nazarxexe.ui.*
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentIteratorType
+import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.format.TextColor
 import kotlin.math.sin
 
@@ -37,6 +40,22 @@ class PulseState(val shift: Float) {
         val darker = TextColor.color(color.red() * 3/4, color.green() * 3/4, color.blue() * 3/4)
         return TextColor.lerp(shift, color, darker)
     }
+
+    fun applyTo(
+        component: ComponentLike
+    ): Component {
+        var newComponent = Component.empty()
+        val iter = component.asComponent().iterator(ComponentIteratorType.DEPTH_FIRST)
+        iter.next() // Skip first one because it will yield whole component.
+
+        iter.forEach {
+            val ccolor = it.color() ?: return@forEach
+            newComponent = newComponent.append(it.color(color(ccolor))) // No way I cooked this...
+        }
+
+        return newComponent
+    }
+
 }
 fun Gui.pulse(scheduler: Scheduler, timePerTick: Float = 0.2f): PulseInternalState {
     return pulse(scheduler, { (sin(it)+1)/2 }, timePerTick)
