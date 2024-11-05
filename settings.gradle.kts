@@ -4,7 +4,7 @@ plugins {
 rootProject.name = "XeXeGUI"
 include("core")
 include("tests")
-include("adventure_util")
+include("adventure")
 include("route")
 include("pagination")
 include("coroutine")

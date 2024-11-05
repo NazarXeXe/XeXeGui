@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     api(project(":core"))
-    api(project(":adventure_util"))
+    api(project(":adventure"))
     api(project(":route"))
     api(project(":pagination"))
     api(project(":coroutine"))

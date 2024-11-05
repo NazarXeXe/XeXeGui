@@ -35,6 +35,9 @@ class Suspense(val slot: Int? = null, val mainScope: CoroutineScope, val asyncSc
                     suspendingComponent(componentBuilder)
                 }.join()
                 composables.clear()
+                child?.states?.forEach {
+                    if (it is ClosableState) it.close()
+                }
                 child?.changeSignal {  }
                 componentBuilder.build().also {
                     child = it
