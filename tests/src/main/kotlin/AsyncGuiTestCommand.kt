@@ -10,6 +10,7 @@ import io.ktor.client.statement.*
 import kotlinx.coroutines.delay
 import me.nazarxexe.ui.Scheduler
 import me.nazarxexe.ui.click
+import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.shimmer.shimmer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Material
@@ -35,22 +36,12 @@ class AsyncGuiTestCommand(val scheduler: Scheduler) : CommandExecutor {
                     }
                     render {
                         ItemStack(Material.PLAYER_HEAD).also { itm ->
-                            itm.itemMeta!!.also {
-                                it.setDisplayName(
-                                    LegacyComponentSerializer.legacySection().serialize(
-                                        shimmer.applyTo(
-                                            "||||||||||||||||||"
-                                        )
-                                    )
-                                )
-                                it.lore = listOf(
-                                    LegacyComponentSerializer.legacySection().serialize(
-                                        shimmer.applyTo(
-                                            "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
-                                        )
-                                    )
-                                )
-                                itm.itemMeta = it
+                            itm.componentItemMeta.also {
+                                it.displayName = shimmer.applyTo("||||||||||||||||||")
+                                it.lore(shimmer.applyTo(
+                                    "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+                                ))
+                                itm.componentItemMeta = it
                             }
                         }
                     }

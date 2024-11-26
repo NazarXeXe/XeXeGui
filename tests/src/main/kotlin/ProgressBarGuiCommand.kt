@@ -1,9 +1,6 @@
 package me.nazarxexe.ui.testing
 
-import me.nazarxexe.ui.Scheduler
-import me.nazarxexe.ui.click
-import me.nazarxexe.ui.component
-import me.nazarxexe.ui.gui
+import me.nazarxexe.ui.*
 import me.nazarxexe.ui.progressbar.progressBar
 import me.nazarxexe.ui.shimmer.shimmer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -38,15 +35,15 @@ class ProgressBarGuiCommand(val scheduler: Scheduler) : CommandExecutor {
                 }
                 render {
                     val item = ItemStack(Material.STONE)
-                    val meta = item.itemMeta!!
+                    val meta = item.componentItemMeta
 
-                    meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(progressBar.make(
+                    meta.displayName = progressBar.make(
                         size = 30,
                         fillingStyle = {
                             theShimmer.applyTo(this)
                         }
-                    )))
-                    item.itemMeta = meta
+                    )
+                    item.componentItemMeta = meta
                     item
                 }
             }

@@ -6,7 +6,6 @@ import me.nazarxexe.ui.pulse.pulse
 import me.nazarxexe.ui.shimmer.shimmer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -29,13 +28,9 @@ class AdventureUtilTest(val scheduler: Scheduler) : CommandExecutor {
                 val myShimmer by hook(shimmer)
                 render {
                     val item = ItemStack(Material.WHITE_WOOL)
-                    val mat = item.itemMeta!!
-                    mat.setDisplayName(
-                        LegacyComponentSerializer.legacySection().serialize(
-                            myShimmer.applyTo("THE SHIMMMMMMMEEEERRR!!!")
-                        )
-                    )
-                    item.itemMeta = mat
+                    val mat = item.componentItemMeta
+                    mat.displayName = myShimmer.applyTo("THE SHIMMMMMMMEEEERRR!!!")
+                    item.componentItemMeta = mat
                     item
                 }
             }
@@ -43,18 +38,10 @@ class AdventureUtilTest(val scheduler: Scheduler) : CommandExecutor {
                 val myPulse by hook(pulse)
                 render {
                     val item = ItemStack(Material.WHITE_WOOL)
-                    val mat = item.itemMeta!!
-                    mat.setDisplayName(
-                        LegacyComponentSerializer.legacySection().serialize(
-                            Component.text("PULSEEEEEE").color(myPulse.color(NamedTextColor.WHITE))
-                        )
-                    )
-                    mat.lore = listOf(
-                        LegacyComponentSerializer.legacySection().serialize(
-                            myPulse.applyTo(minimessage("<rainbow>Colorful pulsed.")).asComponent()
-                        )
-                    )
-                    item.itemMeta = mat
+                    val mat = item.componentItemMeta
+                    mat.displayName = Component.text("PULSEEEEEE").color(myPulse.color(NamedTextColor.WHITE))
+                    mat.lore(myPulse.applyTo(minimessage("<rainbow>Colorful pulsed.")).asComponent())
+                    item.componentItemMeta = mat
                     item
                 }
             }
@@ -69,13 +56,9 @@ class AdventureUtilTest(val scheduler: Scheduler) : CommandExecutor {
                 }
                 render {
                     ItemStack(Material.DIRT).also { itm ->
-                        itm.itemMeta!!.also {
-                            it.setDisplayName(
-                                LegacyComponentSerializer.legacySection().serialize(
-                                    pgbr.make().append(minimessage(" <white>${floor(progressBar*100)}%</white>"))
-                                )
-                            )
-                            itm.itemMeta = it
+                        itm.componentItemMeta.also {
+                            it.displayName = pgbr.make().append(minimessage(" <white>${floor(progressBar*100)}%</white>"))
+                            itm.componentItemMeta = it
                         }
                     }
                 }

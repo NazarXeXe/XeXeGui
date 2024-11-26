@@ -30,16 +30,10 @@ class PlaceholderAPITestCommand(val scheduler: Scheduler): CommandExecutor {
                 val experience by placeholderState(scheduler, "%player_exp_to_level%", sender)
                 render {
                     ItemStack(Material.DIAMOND).also { itm ->
-                        itm.itemMeta!!.also {
-                            it.setDisplayName(LegacyComponentSerializer.legacySection().serialize(
-                                minimessage("<gray>Your ping: <green>$playerPing")
-                            ))
-                            it.lore = mutableListOf(
-                                LegacyComponentSerializer.legacySection().serialize(
-                                    minimessage("<gray>Your experience: $experience")
-                                )
-                            )
-                            itm.itemMeta = it
+                        itm.componentItemMeta.also {
+                            it.displayName = minimessage("<gray>Your ping: <green>$playerPing")
+                            it.lore(minimessage("<gray>Your experience: $experience"))
+                            itm.componentItemMeta = it
                         }
                     }
                 }

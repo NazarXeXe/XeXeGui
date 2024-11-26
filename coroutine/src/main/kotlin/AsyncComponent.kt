@@ -20,7 +20,6 @@ class Suspense(val slot: Int? = null, val mainScope: CoroutineScope, val asyncSc
         suspendingComponent = suspending
     }
 
-
     fun make(): GuiComponent {
         return component(slot) {
             val composables = mutableListOf<GuiComposable>()
