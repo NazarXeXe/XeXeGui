@@ -15,7 +15,7 @@ class BasicGuiCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
         if (sender !is Player) return false
 
-        val gui = gui(InventoryType.CHEST.defaultSize) {
+        val gui = gui {
             click { it.isCancelled = true }
             component(0) {
                 var count by state(0)

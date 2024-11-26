@@ -4,10 +4,17 @@ import me.nazarxexe.ui.*
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Pagination>() {
+open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Unit>() {
 
     val pages = mutableMapOf<Int, Page>()
     protected val currentComposable = mutableListOf<GuiComposable>()
+
+    var page: Int
+        get() = currentPage
+        set(value) {
+            changePage(value)
+            currentPage = value
+        }
 
     open fun createNewPage(at: Int): Page {
         val page = Page(this)
@@ -39,6 +46,8 @@ open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Paginat
         hooks.forEach { it.signal() }
     }
 
+
+
     open fun update() {
         val page = (pages[currentPage] ?: error("Page doesn't exist.")).iterator()
         paginationComponents.forEach {
@@ -67,9 +76,7 @@ open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Paginat
         }
     }
 
-    override fun value(): Pagination {
-        return this
-    }
+    override fun value(): Unit = Unit
 
 }
 

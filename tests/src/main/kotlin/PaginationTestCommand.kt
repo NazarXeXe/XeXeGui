@@ -42,7 +42,7 @@ class PaginationTestCommand : CommandExecutor {
             component(21) {
                 button {
                     if (pagination.currentPage > 0)
-                        pagination.changePage(pagination.currentPage - 1)
+                        pagination.page--
                 }
                 render {
                     ItemStack(Material.ARROW)
@@ -56,7 +56,7 @@ class PaginationTestCommand : CommandExecutor {
             }
             component(23) {
                 button {
-                    pagination.changePage(pagination.currentPage + 1)
+                    pagination.page++
                 }
                 render {
                     ItemStack(Material.ARROW)
