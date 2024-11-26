@@ -156,7 +156,7 @@ val scheduler = object : Scheduler {
     }
 }
 
-asyncGui(9, scheduler) {
+val myGui = asyncGui(9, scheduler) {
     // Shimmer effect to make cool loading
     // The shimmer effect creates a bukkit task that runs every tick.
     // The task will stop when the GUI is closed or the suspending component is completed.
@@ -209,6 +209,9 @@ asyncGui(9, scheduler) {
         }
     }
 }
+
+// Show
+MyGuiHandler.openTo(player, myGui)
 ```
 Result:
 <br />
