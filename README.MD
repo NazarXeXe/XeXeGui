@@ -3,7 +3,7 @@ A new way to make GUIs.
 
 # Setup
 
-First of all you need to add the library as dependency.
+First of all, you need to add the library as a dependency.
 ```kotlin
 repositories {
     maven("https://jitpack.io")
@@ -43,12 +43,12 @@ MyGuiHandler.openTo(
 ## Simple gui
 ```kotlin
 val myGui = gui {
-    click { it.isCancelled = true } // Prevents player picking up items.
+    click { it.isCancelled = true } // Prevents player from picking up items.
     component(0 /* slot */) {
         var count by state(0) // This is delegated variable.
                             // When variable is changed, component re-renders.
         button { // Listens to InventoryClickEvent
-            count++ // This is where update happens.
+            count++ // This is where the update happens.
         }
         render {
             val item = ItemStack(Material.REDSTONE)
@@ -73,7 +73,7 @@ val myGui = gui {
         it.isCancelled = true
     }
     // Pagination reserves 7 slots.
-    // Cache if you want to keep the components when user is switches to another page.
+    // Cache if you want to keep the components when the user switches to another page.
     val pagination = dynPagination(10..16, cache = true) { thePage: Int ->
         val page = Page(this)
         for (i in 0..6) {
@@ -96,7 +96,7 @@ val myGui = gui {
     component(21) { // Previous
         // hook(pagination)
         // The hook will re-render the component when page is changed.
-        // It would be useful if you want to hide/show the component when user at n page.
+        // It would be useful if you want to hide/show the component when the user is on the n page.
         button {
             if (pagination.currentPage > 0)
                 pagination.page--
@@ -158,8 +158,8 @@ val scheduler = object : Scheduler {
 
 asyncGui(9, scheduler) {
     // Shimmer effect to make cool loading
-    // The shimmer effect creates bukkit task that runs every tick
-    // The task will stop when gui is closed or suspending component is completed.
+    // The shimmer effect creates a bukkit task that runs every tick.
+    // The task will stop when the GUI is closed or the suspending component is completed.
     val guiShimmer = shimmer(scheduler) 
     val client = HttpClient(CIO) // HTTP client from ktor
     click { it.isCancelled = true }
@@ -184,7 +184,7 @@ asyncGui(9, scheduler) {
             }
         }
         suspendingComponent { // <-- suspending block.
-                            // This is where you call IO blocking functions
+                            // This is where you call IO blocking functions.
                             // The render, states, event blocks are sync!!
             delay(2000) // It's for people who have blazingly fast internet.
             
