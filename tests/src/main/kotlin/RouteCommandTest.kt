@@ -3,6 +3,7 @@ package me.nazarxexe.ui.testing
 import me.nazarxexe.ui.GuiHandler
 import me.nazarxexe.ui.click
 import me.nazarxexe.ui.component
+import me.nazarxexe.ui.route.gui
 import me.nazarxexe.ui.route.route
 import org.bukkit.Material
 import org.bukkit.command.Command

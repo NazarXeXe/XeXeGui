@@ -10,18 +10,14 @@ open class Route(
     val guiHandler: GuiHandler,
     val player: UUID
 ) {
-
-    val map = mutableMapOf<String, RoutedGui>() // Map literally
-
-    fun gui(path: String, slots: Int = InventoryType.CHEST.defaultSize, builder: Gui.(Route) -> Unit) {
-        map[path] = RoutedGui(slots, this, builder)
+    val map = mutableMapOf<String, Routable<*>>() // Map literally
+    open fun gui(path: String, routable: Routable<*>) {
+        map[path] = routable
     }
-
-    fun mov(to: String) {
+    open fun mov(to: String) {
         val result = map[to] ?: error("Couldn't find any guis for $to.")
-        guiHandler.openTo(Bukkit.getPlayer(player) ?: error("Player is offline."), result.buildGui())
+        guiHandler.openTo(Bukkit.getPlayer(player) ?: error("Player is offline."), result.make())
     }
-
 }
 
 inline fun route(handler: GuiHandler, player: UUID, block: Route.() -> Unit): Route {
@@ -33,10 +29,18 @@ inline fun route(handler: GuiHandler, player: UUID, block: Route.() -> Unit): Ro
     return route
 }
 
-class RoutedGui(val slots: Int, val parent: Route, val guiBuilder: Gui.(Route) -> Unit) {
-    internal fun buildGui(): Gui {
+fun <T: Route> T.gui(path: String, slots: Int = org.bukkit.event.inventory.InventoryType.CHEST.defaultSize, builder: Gui.(T) -> Unit) {
+    gui(path, RoutedGui(slots, this, builder))
+}
+
+interface Routable<T: Route> {
+    fun make(): Gui
+}
+
+class RoutedGui<T: Route>(val slots: Int, val context: T, val guiBuilder: Gui.(T) -> Unit): Routable<T> {
+    override fun make(): Gui {
         val gui = Gui(slots)
-        guiBuilder(gui, parent)
+        guiBuilder(gui, context)
         return gui
     }
 }

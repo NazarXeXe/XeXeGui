@@ -17,6 +17,7 @@ abstract class GuiComponent(
     val states: List<ComponentState<*>> = listOf()
 ) {
     abstract fun render(): ItemStack
+
     open fun signal() {
         this.signal.invoke()
     }
@@ -102,6 +103,7 @@ open class GuiComponentBuilder(val slot: Int?) {
             override fun render(): ItemStack {
                 return this@GuiComponentBuilder.render()
             }
+
         }
     }
 }

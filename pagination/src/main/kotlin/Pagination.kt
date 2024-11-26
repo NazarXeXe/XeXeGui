@@ -106,6 +106,7 @@ class PaginationComponent : GuiComponent() {
     override fun render(): ItemStack {
         return child?.render() ?: ItemStack(Material.AIR)
     }
+
 }
 
 
