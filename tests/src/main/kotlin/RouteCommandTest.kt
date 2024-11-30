@@ -1,10 +1,9 @@
 package me.nazarxexe.ui.testing
 
-import me.nazarxexe.ui.GuiHandler
-import me.nazarxexe.ui.click
-import me.nazarxexe.ui.component
+import me.nazarxexe.ui.*
 import me.nazarxexe.ui.route.gui
 import me.nazarxexe.ui.route.route
+import me.nazarxexe.ui.route.subroute
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -16,14 +15,14 @@ class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
         if (sender !is Player) return false
 
-        route(guiHandler, sender.uniqueId) {
+        route(guiHandler) {
             gui("1") { route ->
                 click {
                     it.isCancelled = true
                 }
                 component(0) {
                     button {
-                        route.mov("2")
+                        route.mov(sender.uniqueId, "2")
                     }
                     render {
                         val item = ItemStack(Material.STONE)
@@ -33,6 +32,21 @@ class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
                         item
                     }
                 }
+
+                component(1) {
+                    button {
+                        route.mov(sender.uniqueId, "hi/1")
+                    }
+                    render {
+                        ItemStack(Material.REDSTONE).also {
+                            it.componentItemMeta.also { c ->
+                                c.displayName = minimessage("<red>Go to test/1")
+                                it.componentItemMeta = c
+                            }
+                        }
+                    }
+                }
+
             }
             gui("2") { route ->
                 click {
@@ -40,7 +54,7 @@ class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
                 }
                 component(1) {
                     button {
-                        route.mov("1")
+                        route.mov(sender.uniqueId, "1")
                     }
                     render {
                         val item = ItemStack(Material.STONE)
@@ -50,8 +64,23 @@ class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
                         item
                     }
                 }
+
             }
-            mov("1")
+            subroute("hi", GuiHandle) {
+                gui("1") {
+                    component(0) {
+                        render {
+                            ItemStack(Material.DIAMOND).also {
+                                it.componentItemMeta.also { c ->
+                                    c.displayName = minimessage("<red>Hi")
+                                    it.componentItemMeta = c
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            mov(sender.uniqueId, "1")
         }
 
 

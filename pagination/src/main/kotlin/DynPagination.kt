@@ -14,7 +14,7 @@ class DynPagination(
             return
         }
         if (!cache)
-            pages.clear() // If its not cached there's no point saving pages.
+            pages.clear() // If it's not cached there's no point saving pages.
         pages[to] = pageSupplier(this, to)
         super.changePage(to)
     }

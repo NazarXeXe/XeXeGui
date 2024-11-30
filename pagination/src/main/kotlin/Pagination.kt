@@ -46,8 +46,6 @@ open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Unit>()
         hooks.forEach { it.signal() }
     }
 
-
-
     open fun update() {
         val page = (pages[currentPage] ?: error("Page doesn't exist.")).iterator()
         paginationComponents.forEach {
