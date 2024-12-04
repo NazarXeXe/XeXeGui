@@ -1,8 +1,6 @@
 package me.nazarxexe.ui.blueprint
 
 import me.nazarxexe.ui.Gui
-import me.nazarxexe.ui.GuiComponentBuilder
-import org.bukkit.configuration.ConfigurationSection
 import java.util.UUID
 
 class BlueprintGui(

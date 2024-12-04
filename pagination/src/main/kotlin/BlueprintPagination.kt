@@ -1,9 +1,7 @@
 package me.nazarxexe.ui.pagination
 
 import me.nazarxexe.ui.blueprint.*
-import org.bukkit.configuration.ConfigurationSection
 import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 
 class BlueprintPagination(
     val name: String,

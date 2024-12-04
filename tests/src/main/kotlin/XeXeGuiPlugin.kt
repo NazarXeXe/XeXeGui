@@ -1,18 +1,10 @@
 package me.nazarxexe.ui.testing
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.yield
 import me.nazarxexe.ui.Scheduler
 import me.nazarxexe.ui.blueprint.*
 import me.nazarxexe.ui.click
 import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.minimessage
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentIteratorType
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Material
 import org.bukkit.command.CommandExecutor
 import org.bukkit.inventory.ItemStack
