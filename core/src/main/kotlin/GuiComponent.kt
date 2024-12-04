@@ -3,6 +3,9 @@ package me.nazarxexe.ui
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -108,8 +111,20 @@ open class GuiComponentBuilder(val slot: Int?) {
     }
 }
 
+@OptIn(ExperimentalContracts::class)
 inline fun component(slot: Int? = null, crossinline impl: GuiComponentBuilder.() -> Unit): GuiComponent {
+    contract {
+        callsInPlace(impl, InvocationKind.EXACTLY_ONCE)
+    }
+    return componentBuilder(slot, impl).build()
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun componentBuilder(slot: Int? = null, crossinline impl: GuiComponentBuilder.() -> Unit): GuiComponentBuilder {
+    contract {
+        callsInPlace(impl, InvocationKind.EXACTLY_ONCE)
+    }
     val builder = GuiComponentBuilder(slot)
     impl(builder)
-    return builder.build()
+    return builder
 }

@@ -5,6 +5,9 @@ import org.bukkit.entity.HumanEntity
 import org.bukkit.event.inventory.*
 import org.bukkit.inventory.ItemStack
 import java.util.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 fun interface GuiComposable {
     fun react(e: InventoryEvent)
@@ -74,7 +77,11 @@ inline fun Gui.click(crossinline impl: (e: InventoryClickEvent) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalContracts::class)
 inline fun gui(slots: Int = InventoryType.CHEST.defaultSize, init: Gui.() -> Unit): Gui {
+    contract { 
+        callsInPlace(init, InvocationKind.EXACTLY_ONCE)
+    }
     val gui = Gui(slots)
     init(gui)
     return gui
@@ -111,7 +118,11 @@ interface ClosableState {
     fun close()
 }
 
+@OptIn(ExperimentalContracts::class)
 inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> Unit) {
+    contract {
+        callsInPlace(impl, InvocationKind.EXACTLY_ONCE)
+    }
     val builder = GuiComponentBuilder(slot)
     impl(builder)
     val build = builder.build()

@@ -23,3 +23,5 @@ commands:
     permission: "xexegui.test"
   xexegui_test_placeholderapi:
     permission: "xexegui.test"
+  xexegui_test_config:
+    permission: "xexegui.test"

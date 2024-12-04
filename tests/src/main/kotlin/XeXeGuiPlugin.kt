@@ -5,12 +5,17 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.yield
 import me.nazarxexe.ui.Scheduler
+import me.nazarxexe.ui.blueprint.*
+import me.nazarxexe.ui.click
+import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.minimessage
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentIteratorType
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import org.bukkit.Material
 import org.bukkit.command.CommandExecutor
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
 
@@ -22,8 +27,46 @@ class XeXeGuiPlugin : JavaPlugin() {
     }
 
     override fun onEnable() {
+        saveDefaultConfig()
         server.pluginManager.registerEvents(GuiHandle, this)
+
+        val configuredGui = configuredGui("gui") {
+            val canTake by configuredField<Boolean>("canTake")
+            gui {
+                click { it.isCancelled = !(canTake ?: false) }
+            }
+            configuredComponent("myComponent") {
+                val header by configuredField<String>("header")
+                component {
+                    render {
+                        ItemStack(Material.DIAMOND).also {
+                            it.componentItemMeta.also { m ->
+                                m.displayName = minimessage(header ?: "Unknown")
+                                it.componentItemMeta = m
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        val result = configuredGui.configure(ConfigSection(config, "gui"))
+
+        /**
+         * I'll give it free pass for now.
+         * If error occurs, notify the user that gui is misconfigured and refuse to open the gui
+         */
+        if (result is BlueprintErrors) {
+            logger.warning(result.message)
+            result.errors.forEach { logger.warning(it.message) }
+        }
+        if (result is BlueprintError) {
+            logger.warning(result.message)
+        }
+
+
         val shedul = object : Scheduler {
+
             override fun run(runnable: () -> Unit): BukkitTask {
                 return server.scheduler.runTask(this@XeXeGuiPlugin, runnable)
             }
@@ -39,5 +82,6 @@ class XeXeGuiPlugin : JavaPlugin() {
         register("xexegui_test_pagination", PaginationTestCommand())
         register("xexegui_test_suspense", AsyncGuiTestCommand(shedul))
         register("xexegui_test_placeholderapi", PlaceholderAPITestCommand(shedul))
+        register("xexegui_test_config", ConfigGuiTestCommand(configuredGui))
     }
 }
