@@ -73,10 +73,12 @@ val myGui = gui {
         it.isCancelled = true
     }
     // Pagination reserves 7 slots.
+    // You can use pagination() but I need to generate new page before users goes to another page.
     // Cache if you want to keep the components when the user switches to another page.
     val pagination = dynPagination(10..16, cache = true) { thePage: Int ->
         val page = Page(this)
         for (i in 0..6) {
+            // Keep in mind that slots should be around range of page!
             page.set(i + 10, component {
                 render {
                     ItemStack(Material.DIRT).also { itm ->
@@ -91,7 +93,7 @@ val myGui = gui {
         page
     }
     
-    pagination.changePage(0) // Renders components at first page.
+    pagination.page = 0 // Renders components at first page.
     
     component(21) { // Previous
         // hook(pagination)
@@ -157,17 +159,15 @@ val scheduler = object : Scheduler {
 }
 
 val myGui = asyncGui(9, scheduler) {
-    // Shimmer effect to make cool loading
-    // The shimmer effect creates a bukkit task that runs every tick.
-    // The task will stop when the GUI is closed or the suspending component is completed.
-    val guiShimmer = shimmer(scheduler) 
     val client = HttpClient(CIO) // HTTP client from ktor
     click { it.isCancelled = true }
     suspense(0) {
         // This component will show first
         fallback {
-            // Hooks to guiShimmer so component re-renders every tick.
-            val shimmer by hook(guiShimmer) 
+            // Shimmer effect to make cool loading
+            // The shimmer effect creates a bukkit task that runs every tick.
+            // The task will stop when the GUI is closed or the suspending component is completed.
+            val shimmer by shimmer(scheduler) 
             button {
                 it.whoClicked.sendMessage("I'm still loading.")
             }

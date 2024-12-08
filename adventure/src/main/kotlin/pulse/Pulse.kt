@@ -6,12 +6,13 @@ import net.kyori.adventure.text.ComponentIteratorType
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.format.TextColor
 import kotlin.math.sin
+import kotlin.properties.ReadWriteProperty
 
 class PulseInternalState(
     scheduler: Scheduler,
     val curve: (Float) -> Float = { (sin(it)+1)/2 },
     val timePerTick: Float = 0.2f
-): InternalGuiState<PulseState>(), ClosableState {
+): InternalGuiState<PulseState>() {
 
     var state: PulseState = PulseState(curve(0f))
         set(value) {
@@ -26,10 +27,6 @@ class PulseInternalState(
 
     override fun value(): PulseState {
         return state
-    }
-
-    override fun close() {
-        task.cancel()
     }
 }
 
@@ -64,7 +61,19 @@ fun Gui.pulse(scheduler: Scheduler, timePerTick: Float = 0.2f): PulseInternalSta
 fun Gui.pulse(scheduler: Scheduler, curve: (Float) -> Float, timePerTick: Float = 0.2f): PulseInternalState {
     val state = PulseInternalState(scheduler, curve, timePerTick)
     close {
-        if (viewers().size <= 1) state.close()
+        if (viewers().size <= 1) state.task.cancel()
     }
     return state
+}
+
+fun GuiComponentBuilder.pulse(
+    scheduler: Scheduler,
+    curve: (Float) -> Float = { (sin(it)+1)/2 },
+    timePerTick: Float = 0.2f
+): ReadWriteProperty<Any?, PulseState> {
+    var time = 0f
+    return tickingState(PulseState(0f), scheduler) {
+        time += timePerTick
+        return@tickingState PulseState(curve(time))
+    }
 }

@@ -12,7 +12,6 @@ import me.nazarxexe.ui.Scheduler
 import me.nazarxexe.ui.click
 import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.shimmer.shimmer
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -25,12 +24,11 @@ class AsyncGuiTestCommand(val scheduler: Scheduler) : CommandExecutor {
         if (sender !is Player) return false
 
         GuiHandle.openTo(sender, asyncGui(9, scheduler) {
-            val guiShimmer = shimmer(scheduler)
             val client = HttpClient(CIO)
             click { it.isCancelled = true }
             suspense(0) {
                 fallback {
-                    val shimmer by hook(guiShimmer)
+                    val shimmer by shimmer(scheduler)
                     button {
                         it.whoClicked.sendMessage("I'm still loading.")
                     }

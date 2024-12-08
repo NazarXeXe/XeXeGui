@@ -4,13 +4,14 @@ import me.nazarxexe.ui.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import kotlin.properties.ReadWriteProperty
 
 
 class ShimmerInternalState(
     scheduler: Scheduler,
     val curve: (Float) -> Float = Interp,
     val timePerTick: Float = 0.05f
-) : InternalGuiState<ShimmerState>(), ClosableState {
+) : InternalGuiState<ShimmerState>() {
 
     var state: ShimmerState = ShimmerState(curve(0f))
         set(value) {
@@ -35,12 +36,6 @@ class ShimmerInternalState(
     override fun value(): ShimmerState {
         return state
     }
-
-    override fun close() {
-        task.cancel()
-    }
-
-
 }
 
 data class ShimmerState(private val shift: Float) {
@@ -73,9 +68,20 @@ fun Gui.shimmer(scheduler: Scheduler, timePerTick: Float = 0.05f): ShimmerIntern
 fun Gui.shimmer(scheduler: Scheduler, curve: (Float) -> Float, timePerTick: Float = 0.05f): ShimmerInternalState {
     val state = ShimmerInternalState(scheduler, curve, timePerTick)
     close {
-        if (viewers().size <= 1) state.close()
+        if (viewers().size <= 1) state.task.cancel()
     }
     return state
+}
+
+fun GuiComponentBuilder.shimmer(scheduler: Scheduler,
+                                curve: (Float) -> Float = Interp,
+                                timePerTick: Float = 0.05f): ReadWriteProperty<Any?, ShimmerState> {
+    var time = 0f
+    return tickingState(ShimmerState(0f), scheduler) {
+        time += timePerTick
+        if (time >= 1f) time = 0f
+        return@tickingState ShimmerState(curve(time))
+    }
 }
 
 

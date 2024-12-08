@@ -40,6 +40,30 @@ open class GuiComponentBuilder(val slot: Int?) {
     protected var stateList = mutableListOf<ComponentState<*>>()
     protected var composableList = mutableListOf<GuiComposable>()
 
+    fun <T> GuiComponentBuilder.tickingState(default: T, scheduler: Scheduler, every: Int = 1, block: () -> T): ReadWriteProperty<Any?, T> {
+        val theState = object : ComponentState<T>(), ClosableState {
+            var v: T = default
+            val task = scheduler.runRepeat(every) {
+                v = block()
+                signal()
+            }
+            override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+                return v
+            }
+
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+                v = value
+                signal()
+            }
+
+            override fun close() {
+                task.cancel()
+            }
+        }
+        stateList.add(theState)
+        return theState
+    }
+
     open fun <T> state(default: T): ReadWriteProperty<Any?, T> {
         val state = object : ComponentState<T>() {
             var v: T = default
