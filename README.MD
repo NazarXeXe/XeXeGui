@@ -9,7 +9,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val xexeGuiCommit = "a90e3f4598" // aka version
+val xexeGuiCommit = "8cf6eeb171" // aka version
                                 // Look it up at: https://jitpack.io/#NazarXeXe/XeXeGui
 dependencies {
     implementation("com.github.NazarXeXe.XeXeGui:core:${xexeGuiCommit}")
