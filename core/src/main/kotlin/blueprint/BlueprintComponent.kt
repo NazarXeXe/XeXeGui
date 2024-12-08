@@ -36,6 +36,7 @@ abstract class BlueprintComponent(
     override fun configure(section: ConfigSection): BlueprintResult {
         if (!section.isConfigurationSection()) return error("Isn't a section!")
         val cs = section.asConfigurationSection()
+        
         val character = cs.getString("character") ?: return error("Placeholder character is empty!")
         placeholder = character.first()
         val errs = subBlueprints.map {

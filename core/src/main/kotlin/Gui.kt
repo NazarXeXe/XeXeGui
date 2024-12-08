@@ -16,6 +16,10 @@ fun interface GuiComposable {
 open class Gui(val slots: Int) {
     internal val inventory = Bukkit.createInventory(null, slots)
 
+    open fun lookup(indx: Int): ItemStack? {
+        return inventory.getItem(indx)
+    }
+
     open fun raw(): Array<ItemStack> {
         return inventory.contents
     }
@@ -66,6 +70,13 @@ inline fun Gui.open(crossinline impl: (e: InventoryOpenEvent) -> Unit) {
 inline fun Gui.close(crossinline impl: (e: InventoryCloseEvent) -> Unit) {
     compose {
         if (it !is InventoryCloseEvent) return@compose
+        impl(it)
+    }
+}
+
+inline fun Gui.drag(crossinline impl: (e: InventoryDragEvent) -> Unit) {
+    compose {
+        if (it !is InventoryDragEvent) return@compose
         impl(it)
     }
 }

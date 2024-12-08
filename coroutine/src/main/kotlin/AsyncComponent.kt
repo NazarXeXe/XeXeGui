@@ -66,16 +66,19 @@ inline fun AsyncGui.suspense(slot: Int, impl: Suspense.() -> Unit) {
     guiComposable.addAll(c.composable)
 }
 inline fun Gui.suspense(slot: Int, mainScope: CoroutineScope, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit) {
-    val suspense = Suspense(slot, mainScope, asyncScope)
-    impl(suspense)
+    val suspense = suspenseBuilder(slot, mainScope, asyncScope, impl)
     val c = suspense.make()
     component(slot, c)
     guiComposable.addAll(c.composable)
 }
 inline fun Gui.suspense(slot: Int, mainScope: Scheduler, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit) {
-    val suspense = Suspense(slot, CoroutineScope(SchedulerScope(mainScope)), asyncScope)
-    impl(suspense)
+    val suspense = suspenseBuilder(slot, CoroutineScope(SchedulerScope(mainScope)), asyncScope, impl)
     val c = suspense.make()
     component(slot, c)
     guiComposable.addAll(c.composable)
+}
+inline fun suspenseBuilder(slot: Int, mainScope: CoroutineScope, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit): Suspense {
+    val suspense = Suspense(slot, mainScope, asyncScope)
+    impl(suspense)
+    return suspense
 }

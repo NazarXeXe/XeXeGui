@@ -5,6 +5,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.InventoryCreativeEvent
+import org.bukkit.event.inventory.InventoryDragEvent
+import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.Inventory
 
@@ -45,6 +48,14 @@ open class GuiHandler : Listener {
         }
         if (inv.viewers().size <= 1) {
             list.removeIf { it.inventory == inv.inventory }
+        }
+    }
+
+    @EventHandler
+    open fun drag(e: InventoryDragEvent) {
+        val inv = find(e.inventory) ?: return
+        for (guiComposable in inv.guiComposable) {
+            guiComposable.react(e)
         }
     }
 

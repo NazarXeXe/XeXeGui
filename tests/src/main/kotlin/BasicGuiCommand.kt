@@ -2,6 +2,7 @@ package me.nazarxexe.ui.testing
 
 import me.nazarxexe.ui.click
 import me.nazarxexe.ui.component
+import me.nazarxexe.ui.drag
 import me.nazarxexe.ui.gui
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -17,6 +18,7 @@ class BasicGuiCommand : CommandExecutor {
 
         val gui = gui {
             click { it.isCancelled = true }
+
             component(0) {
                 var count by state(0)
                 button {
