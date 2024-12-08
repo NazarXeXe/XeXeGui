@@ -38,10 +38,10 @@ class PaginationTestCommand : CommandExecutor {
 
                 page
             }
-            pagination.changePage(0)
+            pagination.page = 0 // Update
             component(21) {
                 button {
-                    if (pagination.currentPage > 0)
+                    if (pagination.page > 0)
                         pagination.page--
                 }
                 render {

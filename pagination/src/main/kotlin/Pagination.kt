@@ -14,6 +14,7 @@ open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Unit>()
         set(value) {
             changePage(value)
             currentPage = value
+            hooks.forEach { it.signal() }
         }
 
     open fun createNewPage(at: Int): Page {
@@ -37,13 +38,11 @@ open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Unit>()
         return pages[currentPage]
     }
 
-    var currentPage = 0
-        private set
+    private var currentPage = 0
 
     open fun changePage(to: Int) {
         currentPage = to
         update()
-        hooks.forEach { it.signal() }
     }
 
     open fun update() {
@@ -86,17 +85,13 @@ class Page(val parent: Pagination) {
         if (!parent.reserve.contains(slot)) error("Out of bounds.")
         components[slot]?.changeSignal { }
         components[slot] = component
-        update()
-    }
-
-    internal fun update() {
-        if (parent.getPageAt(currentSlot) == null) return
-        if (currentSlot == parent.currentPage) parent.update()
     }
 
     fun iterator(): Iterator<Map.Entry<Int, GuiComponent>> {
         return components.iterator()
     }
+
+
 
 }
 
