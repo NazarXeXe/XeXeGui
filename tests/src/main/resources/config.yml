@@ -3,7 +3,7 @@ gui:
   canTake: false
   inventory_size: 27 # Chest
   blueprint:
-    # 9 rows 3 columns
+    # 9 columns 3 rows
     - "aaaaaaaaa" # 9
     - ""
     - ""
