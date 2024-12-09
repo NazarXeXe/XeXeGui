@@ -24,6 +24,22 @@ fun <T> GuiComponentBuilder.asyncState(scheduler: Scheduler,
     return state
 }
 
+fun <T> GuiComponentBuilder.asyncState(scheduler: Scheduler,
+                                       default: T,
+                                       scope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: suspend (mutexState: ComponentState<T>) -> Unit): ComponentState<T> {
+    val mutex = mutexStateBuilder(scheduler, default)
+    val job = scope.launch {
+        impl(mutex)
+    }
+    val state = object : ComponentState<T>(), ClosableState {
+        override fun get(): T = mutex.get()
+        override fun set(value: T) = mutex.set(value)
+        override fun close() = job.cancel()
+    }
+    stateList.add(state)
+    return state
+}
+
 fun <T> GuiComponentBuilder.mutexState(scheduler: Scheduler,
                                    default: T): ComponentState<T> {
     val mutex = mutexStateBuilder(scheduler, default)
