@@ -4,7 +4,6 @@ import me.nazarxexe.ui.Gui
 import me.nazarxexe.ui.GuiHandler
 import me.nazarxexe.ui.blueprint.*
 import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
 
 class ConfigurableRoute(
     val guiHandler: GuiHandler,

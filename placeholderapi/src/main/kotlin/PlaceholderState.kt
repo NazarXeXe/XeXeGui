@@ -5,7 +5,6 @@ import me.nazarxexe.ui.*
 import org.bukkit.OfflinePlayer
 import org.bukkit.event.inventory.InventoryCloseEvent
 import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 
 class InternalGuiPlaceholderAPIState<T>(
     scheduler: Scheduler,
