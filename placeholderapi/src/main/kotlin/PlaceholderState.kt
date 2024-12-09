@@ -35,22 +35,14 @@ class ComponentPlaceholderAPIState<T>(
     val player: OfflinePlayer?,
     val customize: (String) -> T
 ): ComponentState<T>(), ClosableState {
-
     val task = scheduler.runRepeat(updateFrequency) {
         this@ComponentPlaceholderAPIState.signal()
     }
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return customize(PlaceholderAPI.setPlaceholders(player, toParse))
-    }
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        error("Read only.")
-    }
-
     override fun close() {
         task.cancel()
     }
+    override fun get(): T = customize(PlaceholderAPI.setPlaceholders(player, toParse))
+    override fun set(value: T) = error("Read only!")
 }
 
 fun <T> GuiComponentBuilder.placeholderState(

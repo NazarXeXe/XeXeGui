@@ -5,7 +5,7 @@ import me.nazarxexe.ui.*
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-class Suspense(val slot: Int? = null, val mainScope: CoroutineScope, val asyncScope: CoroutineScope) {
+class Suspense(val slot: Int? = null, val mainScope: Scheduler, val asyncScope: CoroutineScope) {
 
     private var fallback: GuiComponent = component {  }
     private var suspendingComponent: suspend GuiComponentBuilder.() -> Unit = {}
@@ -23,16 +23,14 @@ class Suspense(val slot: Int? = null, val mainScope: CoroutineScope, val asyncSc
     fun make(): GuiComponent {
         return component(slot) {
             val composables = mutableListOf<GuiComposable>()
-            var child by state<GuiComponent?>(null)
+            var child by mutexState<GuiComponent?>(mainScope, null)
             var dummyState by state(true)
-            mainScope.launch {
+            asyncScope.launch {
                 child = fallback
                 child?.changeSignal { dummyState = !dummyState }
                 composables.addAll(fallback.composable)
                 val componentBuilder = GuiComponentBuilder(slot)
-                asyncScope.launch {
-                    suspendingComponent(componentBuilder)
-                }.join()
+                suspendingComponent(componentBuilder)
                 composables.clear()
                 child?.states?.forEach {
                     if (it is ClosableState) it.close()
@@ -55,29 +53,13 @@ class Suspense(val slot: Int? = null, val mainScope: CoroutineScope, val asyncSc
 
 }
 
-
-
-
-inline fun AsyncGui.suspense(slot: Int, impl: Suspense.() -> Unit) {
-    val suspense = Suspense(slot, this.mainScope, this.asyncScope)
-    impl(suspense)
-    val c = suspense.make()
-    component(slot, c)
-    guiComposable.addAll(c.composable)
-}
-inline fun Gui.suspense(slot: Int, mainScope: CoroutineScope, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit) {
+inline fun Gui.suspense(slot: Int, mainScope: Scheduler, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit) {
     val suspense = suspenseBuilder(slot, mainScope, asyncScope, impl)
     val c = suspense.make()
     component(slot, c)
     guiComposable.addAll(c.composable)
 }
-inline fun Gui.suspense(slot: Int, mainScope: Scheduler, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit) {
-    val suspense = suspenseBuilder(slot, CoroutineScope(SchedulerScope(mainScope)), asyncScope, impl)
-    val c = suspense.make()
-    component(slot, c)
-    guiComposable.addAll(c.composable)
-}
-inline fun suspenseBuilder(slot: Int, mainScope: CoroutineScope, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit): Suspense {
+inline fun suspenseBuilder(slot: Int, mainScope: Scheduler, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit): Suspense {
     val suspense = Suspense(slot, mainScope, asyncScope)
     impl(suspense)
     return suspense

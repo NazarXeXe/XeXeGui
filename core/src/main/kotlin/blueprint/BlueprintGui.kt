@@ -6,7 +6,7 @@ import java.util.UUID
 class BlueprintGui(
     val name: String,
     val blueprints: List<SubBlueprint<GuiMakingProcess>>
-): Blueprint<Gui> {
+): Blueprint<Gui?> {
     var inventorySize = -1
     var blueprint: List<String> = listOf()
 
@@ -73,8 +73,8 @@ class BlueprintGuiBuilder(val name: String) {
 
 data class GuiMakingProcess(val gui: Gui, val blueprint: String)
 
-inline fun configuredGui(section: String, impl: BlueprintGuiBuilder.() -> Unit): BlueprintGui {
-    val builder = BlueprintGuiBuilder(section)
+inline fun configuredGui(name: String, impl: BlueprintGuiBuilder.() -> Unit): BlueprintGui {
+    val builder = BlueprintGuiBuilder(name)
     impl(builder)
     return builder.build()
 }

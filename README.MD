@@ -158,16 +158,15 @@ val scheduler = object : Scheduler {
     }
 }
 
-val myGui = asyncGui(9, scheduler) {
-    val client = HttpClient(CIO) // HTTP client from ktor
+val myGui = gui {
+    // HTTP client (ktor)
+    val client = HttpClient(CIO)
     click { it.isCancelled = true }
-    suspense(0) {
-        // This component will show first
+    suspense(0, scheduler) {
         fallback {
-            // Shimmer effect to make cool loading
-            // The shimmer effect creates a bukkit task that runs every tick.
-            // The task will stop when the GUI is closed or the suspending component is completed.
-            val shimmer by shimmer(scheduler) 
+            // Cool shimmer state that re-render the component every tick.
+            // It will stop when gui is closed or suspending component is done.
+            val shimmer by shimmer(scheduler)
             button {
                 it.whoClicked.sendMessage("I'm still loading.")
             }
@@ -183,17 +182,13 @@ val myGui = asyncGui(9, scheduler) {
                 }
             }
         }
-        suspendingComponent { // <-- suspending block.
-                            // This is where you call IO blocking functions.
-                            // The render, states, event blocks are sync!!
-            delay(2000) // It's for people who have blazingly fast internet.
-            
-            val theQuote = Gson()
-                .fromJson(
-                    // HTTP Request
-                    client.get("https://programming-quotesapi.vercel.app/api/random")
+        suspendingComponent {
+            delay(2000)
+            val theQuote = Gson().fromJson(
+                // REQUEST
+                client.get("https://programming-quotesapi.vercel.app/api/random")
                 .bodyAsText(), ProgrammerQuote::class.java)
-    
+
             button {
                 it.whoClicked.sendMessage("I'm loaded :)")
             }

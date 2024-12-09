@@ -10,6 +10,19 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 abstract class ComponentState<T> : ReadWriteProperty<Any?, T> {
+
+    abstract fun get(): T
+    abstract fun set(value: T)
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        return get()
+    }
+
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        set(value)
+        signal()
+    }
+
     var signal: () -> Unit = {}
         internal set
 }
@@ -37,73 +50,8 @@ abstract class GuiComponent(
 open class GuiComponentBuilder(val slot: Int?) {
 
     protected var render: () -> ItemStack = { ItemStack(Material.AIR) }
-    protected var stateList = mutableListOf<ComponentState<*>>()
+    var stateList = mutableListOf<ComponentState<*>>()
     protected var composableList = mutableListOf<GuiComposable>()
-
-    fun <T> GuiComponentBuilder.tickingState(default: T, scheduler: Scheduler, every: Int = 1, block: () -> T): ReadWriteProperty<Any?, T> {
-        val theState = object : ComponentState<T>(), ClosableState {
-            var v: T = default
-            val task = scheduler.runRepeat(every) {
-                v = block()
-                signal()
-            }
-            override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-                return v
-            }
-
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-                v = value
-                signal()
-            }
-
-            override fun close() {
-                task.cancel()
-            }
-        }
-        stateList.add(theState)
-        return theState
-    }
-
-    open fun <T> state(default: T): ReadWriteProperty<Any?, T> {
-        val state = object : ComponentState<T>() {
-            var v: T = default
-            override fun getValue(thisRef: Any?, property: KProperty<*>): T = v
-
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-                v = value
-                signal()
-            }
-        }
-        stateList.add(state)
-        return state
-    }
-
-    open fun <T> hook(state: GuiState<T>): ComponentState<T> {
-        val theState = object : ComponentState<T>() {
-            override fun getValue(thisRef: Any?, property: KProperty<*>): T = state.value()
-
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-                state.value(value)
-            }
-        }
-        stateList.add(theState)
-        state.hooks.add(theState)
-        return theState
-    }
-
-    open fun <T> hook(state: InternalGuiState<T>): ComponentState<T> {
-        val theState = object : ComponentState<T>() {
-            override fun getValue(thisRef: Any?, property: KProperty<*>): T = state.value()
-
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-                error("Hook $property is read only!")
-            }
-        }
-        stateList.add(theState)
-        state.hooks.add(theState)
-        return theState
-    }
-
 
     open fun render(impl: () -> ItemStack) {
         render = impl
@@ -151,4 +99,63 @@ inline fun componentBuilder(slot: Int? = null, crossinline impl: GuiComponentBui
     val builder = GuiComponentBuilder(slot)
     impl(builder)
     return builder
+}
+
+inline fun <T> GuiComponentBuilder.tickingState(default: T, scheduler: Scheduler, every: Int = 1, crossinline block: () -> T): ReadWriteProperty<Any?, T> {
+    val theState = object : ComponentState<T>(), ClosableState {
+        var v: T = default
+        val task = scheduler.runRepeat(every) {
+            v = block()
+            signal()
+        }
+
+        override fun close() {
+            task.cancel()
+        }
+
+        override fun get(): T = v
+
+        override fun set(value: T) {
+            v = value
+        }
+    }
+    stateList.add(theState)
+    return theState
+}
+
+fun <T> GuiComponentBuilder.state(default: T): ReadWriteProperty<Any?, T> {
+    val state = object : ComponentState<T>() {
+        var v: T = default
+        override fun get(): T = v
+
+        override fun set(value: T) {
+            v = value
+        }
+
+    }
+    stateList.add(state)
+    return state
+}
+
+fun <T> GuiComponentBuilder.hook(state: GuiState<T>): ComponentState<T> {
+    val theState = object : ComponentState<T>() {
+        override fun get(): T = state.value()
+
+        override fun set(value: T) {
+            state.value(value)
+        }
+    }
+    stateList.add(theState)
+    state.hooks.add(theState)
+    return theState
+}
+
+fun <T> GuiComponentBuilder.hook(state: InternalGuiState<T>): ComponentState<T> {
+    val theState = object : ComponentState<T>() {
+        override fun get(): T = state.value()
+        override fun set(value: T) = error("Read only!")
+    }
+    stateList.add(theState)
+    state.hooks.add(theState)
+    return theState
 }
