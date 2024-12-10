@@ -7,7 +7,7 @@ abstract class BlueprintComponent(
     val name: String,
     val makeVisitors: List<MakingVisitor<GuiComponentBuilder>>,
     val configurationVisitors: List<ConfigurationVisitor>,
-): MakingVisitor<GuiMakingProcess>, Blueprint<GuiComponentBuilder>, NamedBlueprint {
+): MakingVisitor<GuiMakingProcess>, ConfigurationVisitor, Blueprint<GuiComponentBuilder>, NamedBlueprint {
 
     private var placeholder = '?'
 

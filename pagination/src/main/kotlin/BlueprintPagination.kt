@@ -67,3 +67,8 @@ fun BlueprintGuiBuilder.pagination(section: String): ReadOnlyProperty<Any?, Pagi
         return@ReadOnlyProperty cpag.pagination
     }
 }
+fun BlueprintGuiBuilder.pagination(section: String, impl: BlueprintPaginationBuilder.() -> Unit) {
+    val cpag = BlueprintPaginationBuilder(section).apply(impl).build()
+    addConfig(cpag)
+    addMake(cpag)
+}

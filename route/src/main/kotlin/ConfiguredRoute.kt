@@ -4,12 +4,12 @@ import me.nazarxexe.ui.Gui
 import me.nazarxexe.ui.GuiHandler
 import me.nazarxexe.ui.blueprint.*
 
-class ConfigurableRoute(
+class ConfiguredRoute(
     val guiHandler: GuiHandler,
     val name: String,
     val configurationVisitor: List<ConfigurationVisitor>,
     val makingVisitor: List<MakingVisitor<Route>>
-): Blueprint<Route>, NamedBlueprint, MakingVisitor<Route> {
+): Blueprint<Route>, NamedBlueprint, MakingVisitor<Route>, ConfigurationVisitor {
 
     override fun name(): String = name
 
@@ -53,8 +53,8 @@ class ConfiguredRouteBuilder(val guiHandler: GuiHandler, val name: String): Conf
         makeVisitors.add(hook)
     }
 
-    fun build(): ConfigurableRoute {
-        return ConfigurableRoute(guiHandler, name, configurationVisitors, makeVisitors.filterIsInstance<MakingVisitor<Route>>())
+    fun build(): ConfiguredRoute {
+        return ConfiguredRoute(guiHandler, name, configurationVisitors, makeVisitors.filterIsInstance<MakingVisitor<Route>>())
     }
 }
 
@@ -67,6 +67,11 @@ inline fun ConfiguredRouteBuilder.configuredGui(name: String, impl: BlueprintGui
 }
 fun ConfiguredRouteBuilder.configuredGui(gui: BlueprintGui) {
     addConfig(gui)
+}
+
+fun configuredRoute(guiHandler: GuiHandler, name: String, impl: ConfiguredRouteBuilder.() -> Unit): ConfiguredRoute {
+    val builder = ConfiguredRouteBuilder(guiHandler ,name).also(impl)
+    return builder.build()
 }
 
 fun ConfiguredRouteBuilder.configuredSubroute(subroute: ConfiguredRouteBuilder) {

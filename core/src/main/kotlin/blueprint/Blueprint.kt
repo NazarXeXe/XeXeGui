@@ -2,7 +2,7 @@ package me.nazarxexe.ui.blueprint
 
 import kotlin.properties.ReadOnlyProperty
 
-interface Blueprint<T>: ConfigurationVisitor {
+interface Blueprint<T> {
     fun make(): T
 }
 
@@ -14,6 +14,22 @@ interface MakingAccessor {
     fun makingVisitors(): List<MakingVisitor<*>>
     fun addMake(hook: MakingVisitor<*>)
 }
+
+fun ConfigurationAccessor.visit(impl: (ConfigSection) -> BlueprintResult) {
+    addConfig(object : ConfigurationVisitor {
+        override fun visit(section: ConfigSection): BlueprintResult {
+            return impl(section)
+        }
+    })
+}
+fun <T> MakingAccessor.visit(impl: (T) -> Unit) {
+    addMake(object : MakingVisitor<T> {
+        override fun visit(make: T) {
+            impl(make)
+        }
+    })
+}
+
 
 interface ConfigurationVisitor {
     fun visit(section: ConfigSection): BlueprintResult

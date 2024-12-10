@@ -5,7 +5,7 @@ class BlueprintGui(
     val name: String,
     val makeVisitors: List<MakingVisitor<GuiMakingProcess>>,
     val configurationVisitors: List<ConfigurationVisitor>
-): Blueprint<Gui>, NamedBlueprint {
+): Blueprint<Gui>, ConfigurationVisitor, NamedBlueprint {
     var inventorySize = -1
     var blueprint: List<String> = listOf()
 
