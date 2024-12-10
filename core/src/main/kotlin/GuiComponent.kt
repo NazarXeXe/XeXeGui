@@ -81,6 +81,17 @@ open class GuiComponentBuilder(val slot: Int?) {
 
         }
     }
+
+    fun clone(): GuiComponentBuilder {
+        return clone(slot)
+    }
+    fun clone(at: Int?): GuiComponentBuilder {
+        val newBuilder = GuiComponentBuilder(at)
+        newBuilder.render = render
+        newBuilder.composableList = composableList
+        newBuilder.stateList = stateList
+        return newBuilder
+    }
 }
 
 @OptIn(ExperimentalContracts::class)

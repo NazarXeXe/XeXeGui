@@ -3,6 +3,7 @@ package me.nazarxexe.ui.blueprint
 import org.bukkit.configuration.ConfigurationSection
 
 data class ConfigSection(val parent: ConfigurationSection, val child: String) {
+
     fun isConfigurationSection(): Boolean {
         return parent.isConfigurationSection(child)
     }

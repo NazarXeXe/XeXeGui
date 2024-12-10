@@ -1,12 +1,11 @@
 package me.nazarxexe.ui.blueprint
 
 import me.nazarxexe.ui.Gui
-import java.util.UUID
-
 class BlueprintGui(
     val name: String,
-    val blueprints: List<SubBlueprint<GuiMakingProcess>>
-): Blueprint<Gui?> {
+    val makeVisitors: List<MakingVisitor<GuiMakingProcess>>,
+    val configurationVisitors: List<ConfigurationVisitor>
+): Blueprint<Gui>, NamedBlueprint {
     var inventorySize = -1
     var blueprint: List<String> = listOf()
 
@@ -14,7 +13,7 @@ class BlueprintGui(
         return name
     }
 
-    override fun configure(section: ConfigSection) : BlueprintResult {
+    override fun visit(section: ConfigSection): BlueprintResult {
         if (!section.isConfigurationSection()) return error("Isn't a section!")
         val cs = section.asConfigurationSection()
         inventorySize = cs.getInt("inventory_size")
@@ -22,53 +21,47 @@ class BlueprintGui(
         if (blueprint.isEmpty()) return error("Blueprint is empty!")
         val blueprintStream = blueprint.reduce { a, b -> a + b }
         if (blueprintStream.length > inventorySize) return error("Blueprint is too long!")
-        val errors = blueprints.map {
-            val subSection = ConfigSection(cs, it.name())
-            it.configure(subSection)
-        }.filterIsInstance<BlueprintError>()
-        if (errors.isNotEmpty()) {
-            return errors(errors)
-        }
-        return ok()
+        return processSubVisitors(section, configurationVisitors)
     }
 
     override fun make(): Gui {
         val gui = Gui(inventorySize)
         val process = GuiMakingProcess(gui, blueprint.reduce { a, b -> a + b })
-        blueprints.filter { it.configured() }.forEach { it.hook(process) }
+        makeVisitors.forEach { it.visit(process) }
         return gui
     }
 
 }
 
-class BlueprintGuiBuilder(val name: String) {
-    private val blueprints: MutableList<SubBlueprint<GuiMakingProcess>> = mutableListOf()
+class BlueprintGuiBuilder(val name: String): ConfigurationAccessor, MakingAccessor {
+    private val makingVisitors = mutableListOf<MakingVisitor<*>>()
+    private val configurationVisitors = mutableListOf<ConfigurationVisitor>()
+
 
     fun gui(impl: Gui.() -> Unit) {
-        blueprints.add(object : SubBlueprint<GuiMakingProcess> {
-            override fun name(): String {
-                return UUID.randomUUID().toString()
-            }
-
-            override fun configure(section: ConfigSection): BlueprintResult {
-                return ok()
-            }
-
-            override fun configured(): Boolean = true
-
-            override fun hook(parent: GuiMakingProcess) {
-                impl(parent.gui)
+        makingVisitors.add(object : MakingVisitor<GuiMakingProcess> {
+            override fun visit(make: GuiMakingProcess) {
+                impl(make.gui)
             }
         })
     }
 
-    fun addSubBlueprint(blueprint: SubBlueprint<GuiMakingProcess>) {
-        blueprints.add(blueprint)
+    fun build(): BlueprintGui {
+        return BlueprintGui(name, makingVisitors.filterIsInstance<MakingVisitor<GuiMakingProcess>>(), configurationVisitors)
     }
 
-    fun build(): BlueprintGui {
-        return BlueprintGui(name, blueprints)
+    override fun configurationVisitors(): List<ConfigurationVisitor> = configurationVisitors
+
+    override fun addConfig(hook: ConfigurationVisitor) {
+        configurationVisitors.add(hook)
     }
+
+    override fun makingVisitors(): List<MakingVisitor<*>> = makingVisitors
+
+    override fun addMake(hook: MakingVisitor<*>) {
+        makingVisitors.add(hook)
+    }
+
 }
 
 data class GuiMakingProcess(val gui: Gui, val blueprint: String)

@@ -42,7 +42,7 @@ class XeXeGuiPlugin : JavaPlugin() {
             }
         }
 
-        val result = configuredGui.configure(ConfigSection(config, "gui"))
+        val result = configuredGui.visit(ConfigSection(config, "gui"))
 
         /**
          * I'll give it free pass for now.

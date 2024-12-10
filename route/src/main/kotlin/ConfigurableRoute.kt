@@ -3,65 +3,75 @@ package me.nazarxexe.ui.route
 import me.nazarxexe.ui.Gui
 import me.nazarxexe.ui.GuiHandler
 import me.nazarxexe.ui.blueprint.*
-import kotlin.properties.ReadOnlyProperty
 
 class ConfigurableRoute(
     val guiHandler: GuiHandler,
     val name: String,
-    val subGuiBlueprints: List<Blueprint<Gui?>>): Blueprint<Route> {
-    override fun name(): String {
-        return name
-    }
+    val configurationVisitor: List<ConfigurationVisitor>,
+    val makingVisitor: List<MakingVisitor<Route>>
+): Blueprint<Route>, NamedBlueprint, MakingVisitor<Route> {
 
-    override fun configure(section: ConfigSection): BlueprintResult {
+    override fun name(): String = name
+
+    override fun visit(section: ConfigSection): BlueprintResult {
         if (!section.isConfigurationSection()) error("Route isn't section!")
-        val errs = subGuiBlueprints.map { it.configure(ConfigSection(section.asConfigurationSection(), it.name())) }.filterIsInstance<BlueprintError>()
-        if (errs.isNotEmpty()) return errors(errs)
-        return ok()
+        return processSubVisitors(section, configurationVisitor)
     }
 
     override fun make(): Route {
         val route = route(guiHandler) {
-            subGuiBlueprints.forEach {
-                it.make() ?: return@route
-                gui(it.name(), object : Routable<Route> {
-                    override fun make(): Gui {
-                        return it.make()!!
-                    }
-                })
+            configurationVisitor.filterIsInstance<Blueprint<Gui>>().forEach {
+                if (it is NamedBlueprint) {
+                    gui(it.name(), object : Routable<Route> {
+                        override fun make(): Gui {
+                            return it.make()
+                        }
+                    })
+                }
             }
         }
+        makingVisitor.forEach { it.visit(route) }
         return route
     }
-}
 
-class ConfiguredRouteBuilder(val guiHandler: GuiHandler, val name: String) {
-    val subBlueprints = mutableListOf<Blueprint<Gui?>>()
-
-    fun build(): ConfigurableRoute {
-        return ConfigurableRoute(guiHandler, name, subBlueprints)
+    override fun visit(make: Route) {
+        make.subroute(name, make())
     }
 }
 
-inline fun <reified T> ConfiguredRouteBuilder.configuredField(name: String): ReadOnlyProperty<Any?, T?> {
-    var o: T? = null
-    subBlueprints.add(object : Blueprint<Gui?> {
-        override fun name(): String {
-            return name
-        }
-        override fun configure(section: ConfigSection): BlueprintResult {
-            if (!section.isType<T>()) return error("Section ${section.parent} -> ${section.child} is not a type of ${T::class.simpleName}!")
-            o = section.get<T>()
-            return ok()
-        }
-        override fun make(): Gui? = null
-    })
-    return ReadOnlyProperty { _, _ -> o }
+class ConfiguredRouteBuilder(val guiHandler: GuiHandler, val name: String): ConfigurationAccessor, MakingAccessor {
+    private val configurationVisitors: MutableList<ConfigurationVisitor> = mutableListOf()
+    private val makeVisitors: MutableList<MakingVisitor<*>> = mutableListOf()
+
+    override fun configurationVisitors(): List<ConfigurationVisitor> = configurationVisitors
+    override fun addConfig(hook: ConfigurationVisitor) {
+        configurationVisitors.add(hook)
+    }
+
+    override fun makingVisitors(): List<MakingVisitor<*>> = makeVisitors
+    override fun addMake(hook: MakingVisitor<*>) {
+        makeVisitors.add(hook)
+    }
+
+    fun build(): ConfigurableRoute {
+        return ConfigurableRoute(guiHandler, name, configurationVisitors, makeVisitors.filterIsInstance<MakingVisitor<Route>>())
+    }
 }
 
+
 inline fun ConfiguredRouteBuilder.configuredGui(name: String, impl: BlueprintGuiBuilder.() -> Unit) {
-    subBlueprints.add(me.nazarxexe.ui.blueprint.configuredGui(name, impl))
+    val builder = BlueprintGuiBuilder(name)
+    impl(builder)
+    val build = builder.build()
+    addConfig(build)
 }
 fun ConfiguredRouteBuilder.configuredGui(gui: BlueprintGui) {
-    subBlueprints.add(gui)
+    addConfig(gui)
+}
+
+fun ConfiguredRouteBuilder.configuredSubroute(subroute: ConfiguredRouteBuilder) {
+    addMake(subroute.build())
+}
+fun ConfiguredRouteBuilder.configuredSubRoute(name: String, impl: ConfiguredRouteBuilder.() -> Unit) {
+    configuredSubroute(ConfiguredRouteBuilder(guiHandler, name).also(impl))
 }
