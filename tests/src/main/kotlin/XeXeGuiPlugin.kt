@@ -7,16 +7,20 @@ import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.minimessage
 import org.bukkit.Material
 import org.bukkit.command.CommandExecutor
+import org.bukkit.command.TabCompleter
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
 
 class XeXeGuiPlugin : JavaPlugin() {
 
-    fun register(cmd: String, executor: CommandExecutor) {
+    private fun register(cmd: String, executor: CommandExecutor) {
         val o = getCommand(cmd) ?: error("Command $cmd not found check the plugin.yml.")
         o.setExecutor(executor)
+        if (executor is TabCompleter)
+            o.tabCompleter = executor
     }
+
 
     override fun onEnable() {
         saveDefaultConfig()
@@ -74,6 +78,6 @@ class XeXeGuiPlugin : JavaPlugin() {
         register("xexegui_test_pagination", PaginationTestCommand())
         register("xexegui_test_suspense", AsyncGuiTestCommand(shedul))
         register("xexegui_test_placeholderapi", PlaceholderAPITestCommand(shedul))
-        register("xexegui_test_config", ConfigGuiTestCommand(configuredGui))
+        register("xexegui_test_config", ConfigGuiTestCommand(this, configuredGui))
     }
 }

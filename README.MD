@@ -9,7 +9,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val xexeGuiCommit = "8cf6eeb171" // aka version
+val xexeGuiCommit = "dc83df68ae" // aka version
                                 // Look it up at: https://jitpack.io/#NazarXeXe/XeXeGui
 dependencies {
     implementation("com.github.NazarXeXe.XeXeGui:core:${xexeGuiCommit}")
@@ -211,3 +211,50 @@ MyGuiHandler.openTo(player, myGui)
 Result:
 <br />
 <img src="https://github.com/NazarXeXe/XeXeGui/blob/main/readme/async.gif?raw=true">
+
+# Configurable GUI
+Many people perfer configurable gui, but it's very complex to make guis configurable. This library attemts to solve this problem.
+<br/>
+Let's make simple configurable gui:
+```kotlin
+val myGui = configuredGui("gui") { // It's blueprint you shouldn't create multiple instances.
+    val canTake by configuredField<Boolean>("canTake") // It will be null in this scope
+    gui { // This block of code executed when blueprint starts making process
+        click { it.isCancelled = !(canTake ?: false) } // canTake should be not null 
+                                                    // Because it's configured in this block.
+    }
+    configuredComponent("myComponent") {
+        val header by configuredField<String>("header") // It will be null in this scope
+        component { // Every configured field should be configured in this block.
+            render {
+                ItemStack(Material.DIAMOND).also {
+                    it.componentItemMeta.also { m ->
+                        m.displayName = minimessage(header ?: "Unknown")
+                        it.componentItemMeta = m
+                    }
+                }
+            }
+        }
+    }
+}
+
+myGui.visit(ConifgSection(this@Plugin.config, "gui")) // Now it's configured.
+                                                    // Call it again when config is reloaded
+MyGuiHandler.openTo(player, myGui.make())
+```
+In config:
+```yml
+gui:
+  canTake: false
+  inventory_size: 27 # Chest
+  blueprint:
+    # 9 columns 3 rows
+    - "aaaaaaaaa" # 9
+    - ""
+    - ""
+  myComponent:
+    character: a
+    header: "<red>Hi"
+```
+Result:
+<img src="https://github.com/NazarXeXe/XeXeGui/blob/main/readme/2024-12-10_17.44.24.png?raw=true">

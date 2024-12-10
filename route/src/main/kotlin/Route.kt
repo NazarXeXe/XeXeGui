@@ -45,6 +45,11 @@ open class Route(
     }
 }
 
+/**
+ * Create route
+ * It makes switching between gui easier.
+ *
+ */
 inline fun route(handler: GuiHandler, block: Route.() -> Unit): Route {
     val route = Route(
         guiHandler = handler,
@@ -52,6 +57,7 @@ inline fun route(handler: GuiHandler, block: Route.() -> Unit): Route {
     block(route)
     return route
 }
+
 inline fun <T: Route> T.subroute(name: String, handler: GuiHandler, block: Route.() -> Unit) {
     val route = Route(
         guiHandler = handler,

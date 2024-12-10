@@ -9,7 +9,7 @@ abstract class BlueprintComponent(
     val configurationVisitors: List<ConfigurationVisitor>,
 ): MakingVisitor<GuiMakingProcess>, ConfigurationVisitor, Blueprint<GuiComponentBuilder>, NamedBlueprint {
 
-    private var placeholder = '?'
+    private var placeholder: Char? = null
 
     override fun visit(make: GuiMakingProcess) {
         make.blueprint.mapIndexed { index, s ->
@@ -27,9 +27,8 @@ abstract class BlueprintComponent(
     override fun visit(section: ConfigSection): BlueprintResult {
         if (!section.isConfigurationSection()) return error("Isn't a section!")
         val cs = section.asConfigurationSection()
-
-        val character = cs.getString("character") ?: return error("Placeholder character is empty!")
-        placeholder = character.first()
+        val character = cs.getString("character")
+        placeholder = character?.first()
         return processSubVisitors(section, configurationVisitors)
     }
 
