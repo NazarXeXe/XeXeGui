@@ -62,8 +62,8 @@ open class GuiComponentBuilder(val slot: Int?) {
     }
 
     open fun button(button: (e: InventoryClickEvent) -> Unit) {
-        if (slot == null) error("Button slot isn't defined.")
         composable {
+            if (slot == null) error("Button slot isn't defined.")
             if (it !is InventoryClickEvent) return@composable
             if (it.slot != slot) return@composable
             button(it)
