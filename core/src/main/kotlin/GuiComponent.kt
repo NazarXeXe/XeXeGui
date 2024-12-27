@@ -2,6 +2,7 @@ package me.nazarxexe.ui
 
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryEvent
 import org.bukkit.inventory.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -62,12 +63,7 @@ open class GuiComponentBuilder(val slot: Int?) {
     }
 
     open fun button(button: (e: InventoryClickEvent) -> Unit) {
-        composable {
-            if (slot == null) error("Button slot isn't defined.")
-            if (it !is InventoryClickEvent) return@composable
-            if (it.slot != slot) return@composable
-            button(it)
-        }
+        composable(Button(slot, button))
     }
 
     open fun build(): GuiComponent {
@@ -88,10 +84,28 @@ open class GuiComponentBuilder(val slot: Int?) {
     fun clone(at: Int?): GuiComponentBuilder {
         val newBuilder = GuiComponentBuilder(at)
         newBuilder.render = render
-        newBuilder.composableList = composableList
+
+        val cl = composableList.toMutableList()
+
+        cl.replaceAll {
+            if (it !is Button) return@replaceAll it
+            Button(at, it.block)
+        }
+
+        newBuilder.composableList = cl
         newBuilder.stateList = stateList
         return newBuilder
     }
+}
+
+internal data class Button(var at: Int?, val block: (e: InventoryClickEvent) -> Unit): GuiComposable {
+    override fun react(e: InventoryEvent) {
+        if (at == null) error("Button slot isn't defined.")
+        if (e !is InventoryClickEvent) return
+        if (e.slot != at) return
+        block(e)
+    }
+
 }
 
 @OptIn(ExperimentalContracts::class)
