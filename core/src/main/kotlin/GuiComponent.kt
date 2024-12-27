@@ -102,7 +102,7 @@ internal data class Button(var at: Int?, val block: (e: InventoryClickEvent) -> 
     override fun react(e: InventoryEvent) {
         if (at == null) error("Button slot isn't defined.")
         if (e !is InventoryClickEvent) return
-        if (e.slot != at) return
+        if (e.rawSlot != at) return
         block(e)
     }
 
