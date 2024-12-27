@@ -144,6 +144,6 @@ inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> 
 
 fun Gui.component(slot: Int, component: GuiComponent) {
     component.changeSignal(createSignal(slot, component))
-
+    guiComposable.addAll(component.composable)
     component.signal()
 }
