@@ -1,27 +1,28 @@
 package me.nazarxexe.ui.testing
 
 import com.google.gson.Gson
-import me.nazarxexe.ui.async.suspense
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.delay
 import me.nazarxexe.ui.Scheduler
+import me.nazarxexe.ui.async.suspense
 import me.nazarxexe.ui.click
 import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.gui
 import me.nazarxexe.ui.shimmer.shimmer
 import org.bukkit.Material
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.incendo.cloud.annotations.Command
 
-class AsyncGuiTestCommand(val scheduler: Scheduler) : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        if (sender !is Player) return false
+class AsyncUICommand(val scheduler: Scheduler) {
+
+    @Command("xexeuitest async")
+    fun show(sender: CommandSender) {
+        if (sender !is Player) return
 
         GuiHandle.openTo(sender, gui {
             val client = HttpClient(CIO)
@@ -65,8 +66,7 @@ class AsyncGuiTestCommand(val scheduler: Scheduler) : CommandExecutor {
             }
         })
 
-
-
-        return true
     }
+
+
 }

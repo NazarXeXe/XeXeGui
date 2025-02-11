@@ -1,21 +1,53 @@
 package me.nazarxexe.ui.testing
 
 import me.nazarxexe.ui.*
+import me.nazarxexe.ui.progressbar.progressBar
+import me.nazarxexe.ui.pulse.pulse
 import me.nazarxexe.ui.route.gui
-import me.nazarxexe.ui.route.route
 import me.nazarxexe.ui.route.subroute
+import me.nazarxexe.ui.shimmer.shimmer
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
+import org.incendo.cloud.annotations.Command
+import kotlin.math.floor
 
-class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        if (sender !is Player) return false
+object BasicUICommand {
 
-        route(guiHandler) {
+    @Command("xexeuitest simple")
+    fun simpleGui(sender: CommandSender) {
+        if (sender !is Player) return
+
+        val gui = gui {
+            click { it.isCancelled = true }
+
+            component(0) {
+                var count by state(0)
+                button {
+                    count++
+                }
+                render {
+                    val item = ItemStack(Material.REDSTONE)
+                    val mat = item.itemMeta ?: error("Air")
+                    mat.displayName(Component.text(count))
+                    item.itemMeta = mat
+                    item
+                }
+            }
+        }
+
+        GuiHandle.openTo(sender, gui)
+    }
+
+    @Command("xexeuitest route")
+    fun route(sender: CommandSender) {
+        if (sender !is Player) return
+        me.nazarxexe.ui.route.route(GuiHandle) {
             gui("1") { route ->
                 click {
                     it.isCancelled = true
@@ -82,8 +114,6 @@ class RouteCommandTest(val guiHandler: GuiHandler) : CommandExecutor {
             }
             mov(sender.uniqueId, "1")
         }
-
-
-        return true
     }
+
 }

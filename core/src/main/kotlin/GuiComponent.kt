@@ -53,9 +53,16 @@ open class GuiComponentBuilder(val slot: Int?) {
     protected var render: () -> ItemStack = { ItemStack(Material.AIR) }
     var stateList = mutableListOf<ComponentState<*>>()
     protected var composableList = mutableListOf<GuiComposable>()
+    protected var refs = mutableListOf<ComponentState<GuiComponent?>>()
 
     open fun render(impl: () -> ItemStack) {
         render = impl
+    }
+
+    open fun ref(): GuiComponentState<GuiComponent?> {
+        val ref = GuiComponentState<GuiComponent?>()
+        refs.add(ref)
+        return ref
     }
 
     open fun composable(composable: GuiComposable) {
@@ -67,7 +74,7 @@ open class GuiComponentBuilder(val slot: Int?) {
     }
 
     open fun build(): GuiComponent {
-        return object : GuiComponent(
+        val component = object : GuiComponent(
             composable = composableList,
             states = stateList
         ) {
@@ -76,6 +83,8 @@ open class GuiComponentBuilder(val slot: Int?) {
             }
 
         }
+        refs.forEach { it.set(component) }
+        return component
     }
 
     fun clone(): GuiComponentBuilder {
@@ -146,6 +155,17 @@ inline fun <T> GuiComponentBuilder.tickingState(default: T, scheduler: Scheduler
     }
     stateList.add(theState)
     return theState
+}
+
+open class GuiComponentState<T>: ComponentState<T?>() {
+    private var v: T? = null
+    override fun get(): T? {
+        return v
+    }
+
+    override fun set(value: T?) {
+        v = value
+    }
 }
 
 fun <T> GuiComponentBuilder.state(default: T): ReadWriteProperty<Any?, T> {

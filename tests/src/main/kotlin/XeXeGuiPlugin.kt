@@ -7,12 +7,18 @@ import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.minimessage
 import org.bukkit.Material
 import org.bukkit.command.CommandExecutor
+import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
+import org.incendo.cloud.annotations.AnnotationParser
+import org.incendo.cloud.execution.ExecutionCoordinator
+import org.incendo.cloud.paper.LegacyPaperCommandManager
 
 class XeXeGuiPlugin : JavaPlugin() {
+
+    lateinit var commandManager: LegacyPaperCommandManager<CommandSender>
 
     private fun register(cmd: String, executor: CommandExecutor) {
         val o = getCommand(cmd) ?: error("Command $cmd not found check the plugin.yml.")
@@ -71,13 +77,21 @@ class XeXeGuiPlugin : JavaPlugin() {
                 return server.scheduler.runTaskTimer(this@XeXeGuiPlugin, runnable, 0, repeat.toLong())
             }
         }
-        register("xexegui_test_adv", AdventureUtilTest(shedul))
-        register("xexegui_test_basic", BasicGuiCommand())
-        register("xexegui_test_progressbar", ProgressBarGuiCommand(shedul))
-        register("xexegui_test_route", RouteCommandTest(GuiHandle))
-        register("xexegui_test_pagination", PaginationTestCommand())
-        register("xexegui_test_suspense", AsyncGuiTestCommand(shedul))
-        register("xexegui_test_placeholderapi", PlaceholderAPITestCommand(shedul))
-        register("xexegui_test_config", ConfigGuiTestCommand(this, configuredGui))
+
+        commandManager = LegacyPaperCommandManager.createNative(
+            this,
+            ExecutionCoordinator.simpleCoordinator()
+        )
+
+        AnnotationParser(commandManager, CommandSender::class.java)
+            .parse(
+                BasicUICommand,
+                AdventureCommand(shedul),
+                AsyncUICommand(shedul),
+                ConfigUICommand(this, configuredGui),
+                PAPIUICommand(shedul),
+            )
+
+
     }
 }

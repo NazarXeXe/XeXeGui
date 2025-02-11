@@ -24,10 +24,10 @@ class Suspense(val slot: Int? = null, val mainScope: Scheduler, val asyncScope: 
         return component(slot) {
             val composables = mutableListOf<GuiComposable>()
             var child by mutexState<GuiComponent?>(mainScope, null)
-            var dummyState by state(true)
+            val ref by ref()
             asyncScope.launch {
                 child = fallback
-                child?.changeSignal { dummyState = !dummyState }
+                child?.changeSignal { ref?.signal() }
                 composables.addAll(fallback.composable)
                 val componentBuilder = GuiComponentBuilder(slot)
                 suspendingComponent(componentBuilder)
@@ -38,7 +38,7 @@ class Suspense(val slot: Int? = null, val mainScope: Scheduler, val asyncScope: 
                 child?.changeSignal {  }
                 componentBuilder.build().also {
                     child = it
-                    it.changeSignal { dummyState = !dummyState }
+                    it.changeSignal { ref?.signal() }
                     composables.addAll(it.composable)
                 }
             }

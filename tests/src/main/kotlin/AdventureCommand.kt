@@ -7,18 +7,20 @@ import me.nazarxexe.ui.shimmer.shimmer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
+import org.incendo.cloud.annotations.Command
 import kotlin.math.floor
 
-class AdventureUtilTest(val scheduler: Scheduler) : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        if (sender !is Player) return false
+class AdventureCommand(private val scheduler: Scheduler) {
+
+
+    @Command("xexeuitest adventure")
+    fun show(sender: CommandSender) {
+        if (sender !is Player) return
         val gui = gui(InventoryType.CHEST.defaultSize) {
             val shimmer = shimmer(scheduler)
             val pulse = pulse(scheduler)
@@ -72,6 +74,6 @@ class AdventureUtilTest(val scheduler: Scheduler) : CommandExecutor {
 
         }
         GuiHandle.openTo(sender, gui)
-        return true
     }
+
 }
