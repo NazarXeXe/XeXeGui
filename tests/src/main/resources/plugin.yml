@@ -4,24 +4,4 @@ version: '69.420'
 description: Testing for xexegui
 load: POSTWORLD
 author: NazarbekAlda
-api_version: 1.20
-depend:
-  - PlaceholderAPI
 api-version: "1.20"
-commands:
-  xexegui_test_basic:
-    permission: "xexegui.test"
-  xexegui_test_adv:
-    permission: "xexegui.test"
-  xexegui_test_progressbar:
-    permission: "xexegui.test"
-  xexegui_test_route:
-    permission: "xexegui.test"
-  xexegui_test_pagination:
-    permission: "xexegui.test"
-  xexegui_test_suspense:
-    permission: "xexegui.test"
-  xexegui_test_placeholderapi:
-    permission: "xexegui.test"
-  xexegui_test_config:
-    permission: "xexegui.test"

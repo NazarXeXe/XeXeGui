@@ -28,8 +28,10 @@ class AsyncUICommand(val scheduler: Scheduler) {
             val client = HttpClient(CIO)
             click { it.isCancelled = true }
             suspense(0, scheduler) {
+                val shimmerSignal = shimmer(scheduler)
                 fallback {
-                    val shimmer by shimmer(scheduler)
+                    hook(shimmerSignal)
+                    val shimmer by shimmerSignal
                     button {
                         it.whoClicked.sendMessage("I'm still loading.")
                     }
@@ -49,7 +51,7 @@ class AsyncUICommand(val scheduler: Scheduler) {
                     delay(2000)
                     val theQuote = Gson().fromJson(client.get("https://programming-quotesapi.vercel.app/api/random")
                         .bodyAsText(), ProgrammerQuote::class.java)
-
+                    shimmerSignal.task.cancel()
                     button {
                         it.whoClicked.sendMessage("I'm loaded :)")
                     }

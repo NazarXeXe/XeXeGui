@@ -27,28 +27,29 @@ class AdventureCommand(private val scheduler: Scheduler) {
             val pgbr = progressBar()
             click { it.isCancelled = true }
             component(0) {
-                val myShimmer by hook(shimmer)
+                hook(shimmer)
                 render {
                     val item = ItemStack(Material.WHITE_WOOL)
                     val mat = item.componentItemMeta
-                    mat.displayName = myShimmer.applyTo("THE SHIMMMMMMMEEEERRR!!!")
+                    mat.displayName = shimmer.value().applyTo("THE SHIMMMMMMMEEEERRR!!!")
                     item.componentItemMeta = mat
                     item
                 }
             }
             component(1) {
-                val myPulse by hook(pulse)
+                hook(pulse)
                 render {
                     val item = ItemStack(Material.WHITE_WOOL)
                     val mat = item.componentItemMeta
-                    mat.displayName = Component.text("PULSEEEEEE").color(myPulse.color(NamedTextColor.WHITE))
-                    mat.lore(myPulse.applyTo(minimessage("<rainbow>Colorful pulsed.")).asComponent())
+                    mat.displayName = Component.text("PULSEEEEEE").color(pulse.value().color(NamedTextColor.WHITE))
+                    mat.lore(pulse.value().applyTo(minimessage("<rainbow>Colorful pulsed.")).asComponent())
                     item.componentItemMeta = mat
                     item
                 }
             }
             component(2) {
-                var progressBar by hook(pgbr)
+                hook(pgbr)
+                var progressBar by pgbr
                 val task = scheduler.runRepeat(20) {
                     if (progressBar >= 1) {
                         progressBar = 0f

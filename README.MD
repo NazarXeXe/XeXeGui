@@ -52,7 +52,7 @@ val myGui = gui {
         }
         render {
             val item = ItemStack(Material.REDSTONE)
-            val mat = item.itemMeta ?: error("Air")
+            val mat = item.itemMeta!!
             mat.setDisplayName("$count")
             item.itemMeta = mat
             item // Shows the item
@@ -96,7 +96,7 @@ val myGui = gui {
     pagination.page = 0 // Renders components at first page.
     
     component(21) { // Previous
-        // hook(pagination)
+        // hook(pagination.pageSignal)
         // The hook will re-render the component when page is changed.
         // It would be useful if you want to hide/show the component when the user is on the n page.
         button {
@@ -114,7 +114,7 @@ val myGui = gui {
         }
     }
     component(23) { // Next
-        // hook(pagination)
+        // hook(pagination.pageSignal)
         button {
             pagination.page++
         }
@@ -163,10 +163,11 @@ val myGui = gui {
     val client = HttpClient(CIO)
     click { it.isCancelled = true }
     suspense(0, scheduler) {
+        val shimmerSignal = shimmer(scheduler)
         fallback {
             // Cool shimmer state that re-render the component every tick.
             // It will stop when gui is closed or suspending component is done.
-            val shimmer by shimmer(scheduler)
+            val shimmer by shimmerSignal
             button {
                 it.whoClicked.sendMessage("I'm still loading.")
             }
@@ -188,7 +189,7 @@ val myGui = gui {
                 // REQUEST
                 client.get("https://programming-quotesapi.vercel.app/api/random")
                 .bodyAsText(), ProgrammerQuote::class.java)
-
+            shimmerSignal.task.cancel() // Stop shimmer after finish.
             button {
                 it.whoClicked.sendMessage("I'm loaded :)")
             }

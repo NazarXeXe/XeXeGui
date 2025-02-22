@@ -23,7 +23,8 @@ class Suspense(val slot: Int? = null, val mainScope: Scheduler, val asyncScope: 
     fun make(): GuiComponent {
         return component(slot) {
             val composables = mutableListOf<GuiComposable>()
-            var child by mutexState<GuiComponent?>(mainScope, null)
+            var child by single(syncSignal<GuiComponent?>(mainScope, null))
+
             val ref by ref()
             asyncScope.launch {
                 child = fallback
@@ -32,9 +33,6 @@ class Suspense(val slot: Int? = null, val mainScope: Scheduler, val asyncScope: 
                 val componentBuilder = GuiComponentBuilder(slot)
                 suspendingComponent(componentBuilder)
                 composables.clear()
-                child?.states?.forEach {
-                    if (it is ClosableState) it.close()
-                }
                 child?.changeSignal {  }
                 componentBuilder.build().also {
                     child = it
@@ -57,7 +55,6 @@ inline fun Gui.suspense(slot: Int, mainScope: Scheduler, asyncScope: CoroutineSc
     val suspense = suspenseBuilder(slot, mainScope, asyncScope, impl)
     val c = suspense.make()
     component(slot, c)
-    guiComposable.addAll(c.composable)
 }
 inline fun suspenseBuilder(slot: Int, mainScope: Scheduler, asyncScope: CoroutineScope = CoroutineScope(Dispatchers.IO), impl: Suspense.() -> Unit): Suspense {
     val suspense = Suspense(slot, mainScope, asyncScope)

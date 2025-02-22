@@ -1,5 +1,7 @@
 package me.nazarxexe.ui
 
+import me.nazarxexe.ui.signals.Signal
+import me.nazarxexe.ui.signals.signal
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryEvent
@@ -7,31 +9,10 @@ import org.bukkit.inventory.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
-
-abstract class ComponentState<T> : ReadWriteProperty<Any?, T> {
-
-    abstract fun get(): T
-    abstract fun set(value: T)
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return get()
-    }
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        set(value)
-        signal()
-    }
-
-    var signal: () -> Unit = {}
-        internal set
-}
 
 abstract class GuiComponent(
     protected var signal: () -> Unit = {},
     val composable: List<GuiComposable> = listOf(),
-    val states: List<ComponentState<*>> = listOf()
 ) {
     abstract fun render(): ItemStack
 
@@ -40,9 +21,6 @@ abstract class GuiComponent(
     }
 
     open fun changeSignal(signal: () -> Unit) {
-        states.forEach {
-            it.signal = signal
-        }
         this.signal = signal
     }
 
@@ -51,17 +29,37 @@ abstract class GuiComponent(
 open class GuiComponentBuilder(val slot: Int?) {
 
     protected var render: () -> ItemStack = { ItemStack(Material.AIR) }
-    var stateList = mutableListOf<ComponentState<*>>()
     protected var composableList = mutableListOf<GuiComposable>()
-    protected var refs = mutableListOf<ComponentState<GuiComponent?>>()
+    protected val buildPromise = mutableListOf<(GuiComponent) -> Unit>()
+
 
     open fun render(impl: () -> ItemStack) {
         render = impl
     }
 
-    open fun ref(): GuiComponentState<GuiComponent?> {
-        val ref = GuiComponentState<GuiComponent?>()
-        refs.add(ref)
+    fun <T: Signal<R>, R> single(signal: T): T {
+        buildPromise.add {
+            signal.addHook {
+                it.signal()
+            }
+        }
+        return signal
+    }
+    fun hook(vararg signals: Signal<*>) {
+        signals.forEach { signal ->
+            buildPromise.add {
+                signal.addHook {
+                    it.signal()
+                }
+            }
+        }
+    }
+
+    open fun ref(): Signal<GuiComponent?> {
+        val ref = signal<GuiComponent?>(null)
+        buildPromise.add {
+            ref.value(it)
+        }
         return ref
     }
 
@@ -76,14 +74,13 @@ open class GuiComponentBuilder(val slot: Int?) {
     open fun build(): GuiComponent {
         val component = object : GuiComponent(
             composable = composableList,
-            states = stateList
         ) {
             override fun render(): ItemStack {
                 return this@GuiComponentBuilder.render()
             }
 
         }
-        refs.forEach { it.set(component) }
+        buildPromise.forEach { it(component) }
         return component
     }
 
@@ -102,7 +99,6 @@ open class GuiComponentBuilder(val slot: Int?) {
         }
 
         newBuilder.composableList = cl
-        newBuilder.stateList = stateList
         return newBuilder
     }
 }
@@ -135,72 +131,8 @@ inline fun componentBuilder(slot: Int? = null, crossinline impl: GuiComponentBui
     return builder
 }
 
-inline fun <T> GuiComponentBuilder.tickingState(default: T, scheduler: Scheduler, every: Int = 1, crossinline block: () -> T): ReadWriteProperty<Any?, T> {
-    val theState = object : ComponentState<T>(), ClosableState {
-        var v: T = default
-        val task = scheduler.runRepeat(every) {
-            v = block()
-            signal()
-        }
-
-        override fun close() {
-            task.cancel()
-        }
-
-        override fun get(): T = v
-
-        override fun set(value: T) {
-            v = value
-        }
-    }
-    stateList.add(theState)
-    return theState
-}
-
-open class GuiComponentState<T>: ComponentState<T?>() {
-    private var v: T? = null
-    override fun get(): T? {
-        return v
-    }
-
-    override fun set(value: T?) {
-        v = value
-    }
-}
-
-fun <T> GuiComponentBuilder.state(default: T): ReadWriteProperty<Any?, T> {
-    val state = object : ComponentState<T>() {
-        var v: T = default
-        override fun get(): T = v
-
-        override fun set(value: T) {
-            v = value
-        }
-
-    }
-    stateList.add(state)
-    return state
-}
-
-fun <T> GuiComponentBuilder.hook(state: GuiState<T>): ComponentState<T> {
-    val theState = object : ComponentState<T>() {
-        override fun get(): T = state.value()
-
-        override fun set(value: T) {
-            state.value(value)
-        }
-    }
-    stateList.add(theState)
-    state.hooks.add(theState)
-    return theState
-}
-
-fun <T> GuiComponentBuilder.hook(state: InternalGuiState<T>): ComponentState<T> {
-    val theState = object : ComponentState<T>() {
-        override fun get(): T = state.value()
-        override fun set(value: T) = error("Read only!")
-    }
-    stateList.add(theState)
-    state.hooks.add(theState)
-    return theState
+inline fun <T> GuiComponentBuilder.state(default: T): Signal<T> {
+    val signal = signal(default)
+    hook(signal)
+    return signal
 }

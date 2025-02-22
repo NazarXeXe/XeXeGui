@@ -98,37 +98,6 @@ inline fun gui(slots: Int = InventoryType.CHEST.defaultSize, init: Gui.() -> Uni
     return gui
 }
 
-open class GuiState<T>(private var default: T) {
-    open fun value(): T {
-        return default
-    }
-
-    open fun value(newValue: T) {
-        default = newValue
-        hooks.forEach { it.signal() }
-
-        return
-    }
-
-    val hooks = mutableListOf<ComponentState<*>>()
-}
-fun <T> Gui.guiState(default: T): GuiState<T> {
-    return GuiState(default)
-}
-
-/**
- * Aka read only.
- */
-abstract class InternalGuiState<T> {
-    abstract fun value(): T
-
-    val hooks = mutableListOf<ComponentState<*>>()
-}
-
-interface ClosableState {
-    fun close()
-}
-
 @OptIn(ExperimentalContracts::class)
 inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> Unit) {
     contract {
@@ -137,8 +106,6 @@ inline fun Gui.component(slot: Int, crossinline impl: GuiComponentBuilder.() -> 
     val builder = GuiComponentBuilder(slot)
     impl(builder)
     val build = builder.build()
-    guiComposable.addAll(build.composable)
-
     component(slot, build)
 }
 

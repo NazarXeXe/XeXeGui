@@ -1,23 +1,27 @@
 package me.nazarxexe.ui.pulse
 
 import me.nazarxexe.ui.*
+import me.nazarxexe.ui.signals.Signal
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentIteratorType
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.format.TextColor
 import kotlin.math.sin
-import kotlin.properties.ReadWriteProperty
 
-class PulseInternalState(
+class PulseSignal(
     scheduler: Scheduler,
     val curve: (Float) -> Float = { (sin(it)+1)/2 },
     val timePerTick: Float = 0.2f
-): InternalGuiState<PulseState>() {
+): Signal<PulseState> {
+    override val hooks: MutableList<() -> Unit> = mutableListOf()
+    override fun addHook(hook: () -> Unit) {
+        hooks.add(hook)
+    }
 
     var state: PulseState = PulseState(curve(0f))
         set(value) {
             field = value
-            hooks.forEach { it.signal() }
+            hooks.forEach { it() }
         }
     var time = 0f
     val task = scheduler.runRepeat {
@@ -28,6 +32,8 @@ class PulseInternalState(
     override fun value(): PulseState {
         return state
     }
+
+    override fun value(value: PulseState) = error("Pulse signal is read only.")
 }
 
 class PulseState(val shift: Float) {
@@ -54,26 +60,11 @@ class PulseState(val shift: Float) {
     }
 
 }
-fun Gui.pulse(scheduler: Scheduler, timePerTick: Float = 0.2f): PulseInternalState {
+fun pulse(scheduler: Scheduler, timePerTick: Float = 0.2f): PulseSignal {
     return pulse(scheduler, { (sin(it)+1)/2 }, timePerTick)
 }
 
-fun Gui.pulse(scheduler: Scheduler, curve: (Float) -> Float, timePerTick: Float = 0.2f): PulseInternalState {
-    val state = PulseInternalState(scheduler, curve, timePerTick)
-    close {
-        if (viewers().size <= 1) state.task.cancel()
-    }
+fun pulse(scheduler: Scheduler, curve: (Float) -> Float, timePerTick: Float = 0.2f): PulseSignal {
+    val state = PulseSignal(scheduler, curve, timePerTick)
     return state
-}
-
-fun GuiComponentBuilder.pulse(
-    scheduler: Scheduler,
-    curve: (Float) -> Float = { (sin(it)+1)/2 },
-    timePerTick: Float = 0.2f
-): ReadWriteProperty<Any?, PulseState> {
-    var time = 0f
-    return tickingState(PulseState(0f), scheduler) {
-        time += timePerTick
-        return@tickingState PulseState(curve(time))
-    }
 }

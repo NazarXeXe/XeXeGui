@@ -1,7 +1,6 @@
 package me.nazarxexe.ui.progressbar
 
-import me.nazarxexe.ui.Gui
-import me.nazarxexe.ui.GuiState
+import me.nazarxexe.ui.signals.Signal
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import kotlin.math.floor
@@ -14,7 +13,18 @@ private fun mul(str: String, times: Int): String {
     return result
 }
 
-class ProgressBarState(progress: Float = 0f) : GuiState<Float>(progress) {
+class ProgressBarSignal(var progress: Float = 0f) : Signal<Float> {
+    override val hooks: MutableList<() -> Unit> = mutableListOf()
+    override fun addHook(hook: () -> Unit) {
+        hooks.add(hook)
+    }
+
+    override fun value(): Float = progress
+
+    override fun value(value: Float) {
+        progress = value
+    }
+
     fun make(
         fillingStyle: TextComponent.() -> Component = { this },
         emptyStyle: TextComponent.() -> Component = { this },
@@ -30,11 +40,11 @@ class ProgressBarState(progress: Float = 0f) : GuiState<Float>(progress) {
 
 }
 
-fun Gui.progressBar(): ProgressBarState {
-    return ProgressBarState()
+fun progressBar(): ProgressBarSignal {
+    return ProgressBarSignal()
 }
 
-fun Gui.progressBar(default: Float): ProgressBarState {
-    return ProgressBarState(default)
+fun progressBar(default: Float): ProgressBarSignal {
+    return ProgressBarSignal(default)
 }
 

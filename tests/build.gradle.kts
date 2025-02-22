@@ -21,7 +21,6 @@ dependencies {
     api(project(":route"))
     api(project(":pagination"))
     api(project(":coroutine"))
-    api(project(":placeholderapi"))
     implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
     implementation("io.ktor:ktor-client-cio-jvm:3.0.0")
 

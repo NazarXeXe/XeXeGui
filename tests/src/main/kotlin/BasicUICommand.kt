@@ -1,28 +1,20 @@
 package me.nazarxexe.ui.testing
 
 import me.nazarxexe.ui.*
-import me.nazarxexe.ui.progressbar.progressBar
-import me.nazarxexe.ui.pulse.pulse
 import me.nazarxexe.ui.route.gui
 import me.nazarxexe.ui.route.subroute
-import me.nazarxexe.ui.shimmer.shimmer
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
 import org.incendo.cloud.annotations.Command
-import kotlin.math.floor
 
 object BasicUICommand {
 
     @Command("xexeuitest simple")
     fun simpleGui(sender: CommandSender) {
         if (sender !is Player) return
-
         val gui = gui {
             click { it.isCancelled = true }
 

@@ -1,22 +1,27 @@
 package me.nazarxexe.ui.shimmer
 
 import me.nazarxexe.ui.*
+import me.nazarxexe.ui.signals.Signal
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import kotlin.properties.ReadWriteProperty
 
 
-class ShimmerInternalState(
+class ShimmerSignal(
     scheduler: Scheduler,
     val curve: (Float) -> Float = Interp,
     val timePerTick: Float = 0.05f
-) : InternalGuiState<ShimmerState>() {
+) : Signal<ShimmerState> {
+    override val hooks: MutableList<() -> Unit> = mutableListOf()
+    override fun addHook(hook: () -> Unit) {
+        hooks.add(hook)
+    }
+
 
     var state: ShimmerState = ShimmerState(curve(0f))
         set(value) {
             field = value
-            hooks.forEach { it.signal() }
+            hooks.forEach { it() }
         }
 
     val task = scheduler.runRepeat {
@@ -36,6 +41,9 @@ class ShimmerInternalState(
     override fun value(): ShimmerState {
         return state
     }
+
+    override fun value(value: ShimmerState) = error("Shimmer signal is read only.")
+
 }
 
 data class ShimmerState(private val shift: Float) {
@@ -61,27 +69,13 @@ data class ShimmerState(private val shift: Float) {
 
 }
 
-fun Gui.shimmer(scheduler: Scheduler, timePerTick: Float = 0.05f): ShimmerInternalState {
+fun shimmer(scheduler: Scheduler, timePerTick: Float = 0.05f): ShimmerSignal {
     return shimmer(scheduler, Interp, timePerTick)
 }
 
-fun Gui.shimmer(scheduler: Scheduler, curve: (Float) -> Float, timePerTick: Float = 0.05f): ShimmerInternalState {
-    val state = ShimmerInternalState(scheduler, curve, timePerTick)
-    close {
-        if (viewers().size <= 1) state.task.cancel()
-    }
+fun shimmer(scheduler: Scheduler, curve: (Float) -> Float, timePerTick: Float = 0.05f): ShimmerSignal {
+    val state = ShimmerSignal(scheduler, curve, timePerTick)
     return state
-}
-
-fun GuiComponentBuilder.shimmer(scheduler: Scheduler,
-                                curve: (Float) -> Float = Interp,
-                                timePerTick: Float = 0.05f): ReadWriteProperty<Any?, ShimmerState> {
-    var time = 0f
-    return tickingState(ShimmerState(0f), scheduler) {
-        time += timePerTick
-        if (time >= 1f) time = 0f
-        return@tickingState ShimmerState(curve(time))
-    }
 }
 
 

@@ -89,7 +89,6 @@ class XeXeGuiPlugin : JavaPlugin() {
                 AdventureCommand(shedul),
                 AsyncUICommand(shedul),
                 ConfigUICommand(this, configuredGui),
-                PAPIUICommand(shedul),
             )
 
 

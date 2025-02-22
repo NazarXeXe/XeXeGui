@@ -1,10 +1,11 @@
 package me.nazarxexe.ui.pagination
 
 import me.nazarxexe.ui.*
+import me.nazarxexe.ui.signals.signal
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Unit>() {
+open class Pagination(val reserve: Set<Int>, gui: Gui) {
 
     val pages = mutableMapOf<Int, Page>()
     protected val currentComposable = mutableListOf<GuiComposable>()
@@ -14,8 +15,10 @@ open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Unit>()
         set(value) {
             changePage(value)
             currentPage = value
-            hooks.forEach { it.signal() }
+            pageSignal.value(value)
         }
+
+    var pageSignal = signal(page)
 
     open fun createNewPage(at: Int): Page {
         val page = Page(this)
@@ -73,7 +76,6 @@ open class Pagination(val reserve: Set<Int>, gui: Gui): InternalGuiState<Unit>()
         }
     }
 
-    override fun value(): Unit = Unit
 
 }
 
