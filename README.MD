@@ -9,7 +9,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val xexeGuiCommit = "dc83df68ae" // aka version
+val xexeGuiCommit = "e86d0bcc49" // aka version
                                 // Look it up at: https://jitpack.io/#NazarXeXe/XeXeGui
 dependencies {
     implementation("com.github.NazarXeXe.XeXeGui:core:${xexeGuiCommit}")
@@ -166,7 +166,6 @@ val myGui = gui {
         val shimmerSignal = shimmer(scheduler)
         fallback {
             // Cool shimmer state that re-render the component every tick.
-            // It will stop when gui is closed or suspending component is done.
             val shimmer by shimmerSignal
             button {
                 it.whoClicked.sendMessage("I'm still loading.")
