@@ -8,10 +8,9 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 fun minimessage(parse: String, vararg tagResolver: TagResolver): Component {
     return MiniMessage.miniMessage().deserialize(parse, *tagResolver)
 }
-
-fun toLegacy(component: Component): String {
+internal fun toLegacy(component: Component): String {
     return LegacyComponentSerializer.legacySection().serialize(component)
 }
-fun fromLegacy(component: String): Component {
+internal fun fromLegacy(component: String): Component {
     return LegacyComponentSerializer.legacySection().deserialize(component)
 }

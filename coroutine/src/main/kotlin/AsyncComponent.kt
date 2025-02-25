@@ -10,10 +10,8 @@ class Suspense(val slot: Int? = null, val mainScope: Scheduler, val asyncScope: 
     private var fallback: GuiComponent = component {  }
     private var suspendingComponent: suspend GuiComponentBuilder.() -> Unit = {}
 
-    fun fallback(fallback: GuiComponentBuilder.() -> Unit) {
-        val gcomponent = GuiComponentBuilder(slot)
-        fallback(gcomponent)
-        this.fallback = gcomponent.build()
+    fun fallback(fallbackC: GuiComponentBuilder.() -> Unit) {
+        this.fallback = componentBuilder(slot, fallbackC).build()
     }
 
     fun suspendingComponent(suspending: suspend GuiComponentBuilder.() -> Unit) {
@@ -24,21 +22,21 @@ class Suspense(val slot: Int? = null, val mainScope: Scheduler, val asyncScope: 
         return component(slot) {
             val composables = mutableListOf<GuiComposable>()
             var child by single(syncSignal<GuiComponent?>(mainScope, null))
-
             val ref by ref()
-            asyncScope.launch {
-                child = fallback
-                child?.changeSignal { ref?.signal() }
-                composables.addAll(fallback.composable)
-                val componentBuilder = GuiComponentBuilder(slot)
-                suspendingComponent(componentBuilder)
+            fun change(component: GuiComponent) {
                 composables.clear()
                 child?.changeSignal {  }
-                componentBuilder.build().also {
-                    child = it
-                    it.changeSignal { ref?.signal() }
-                    composables.addAll(it.composable)
-                }
+
+                child = component
+                child?.changeSignal { ref?.signal() }
+                composables.addAll(component.composable)
+            }
+
+            asyncScope.launch {
+                change(fallback)
+                val componentBuilder = GuiComponentBuilder(slot)
+                suspendingComponent(componentBuilder)
+                change(componentBuilder.build())
             }
             composable { e ->
                 composables.forEach { it.react(e) }

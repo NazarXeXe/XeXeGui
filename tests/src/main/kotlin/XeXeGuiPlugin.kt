@@ -6,9 +6,7 @@ import me.nazarxexe.ui.click
 import me.nazarxexe.ui.componentItemMeta
 import me.nazarxexe.ui.minimessage
 import org.bukkit.Material
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
-import org.bukkit.command.TabCompleter
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitTask
@@ -19,14 +17,6 @@ import org.incendo.cloud.paper.LegacyPaperCommandManager
 class XeXeGuiPlugin : JavaPlugin() {
 
     lateinit var commandManager: LegacyPaperCommandManager<CommandSender>
-
-    private fun register(cmd: String, executor: CommandExecutor) {
-        val o = getCommand(cmd) ?: error("Command $cmd not found check the plugin.yml.")
-        o.setExecutor(executor)
-        if (executor is TabCompleter)
-            o.tabCompleter = executor
-    }
-
 
     override fun onEnable() {
         saveDefaultConfig()

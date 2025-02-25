@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentIteratorType
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.util.HSVLike
 import kotlin.math.sin
 
 class PulseSignal(
@@ -40,18 +41,20 @@ class PulseState(val shift: Float) {
     fun color(
         color: TextColor,
     ): TextColor {
-        val darker = TextColor.color(color.red() * 3/4, color.green() * 3/4, color.blue() * 3/4)
-        return TextColor.lerp(shift, color, darker)
+        val hsv = color.asHSV()
+        val darker = HSVLike.hsvLike(hsv.h(), hsv.s(), 0.6f)
+        return TextColor.lerp(shift, color, TextColor.color(darker))
     }
 
     fun applyTo(
         component: ComponentLike
     ): Component {
         var newComponent = Component.empty()
-        val iter = component.asComponent().iterator(ComponentIteratorType.DEPTH_FIRST)
-        iter.next() // Skip first one because it will yield whole component.
-
+        val compact = component.asComponent().compact()
+        val iter = compact
+            .iterator(ComponentIteratorType.BREADTH_FIRST)
         iter.forEach {
+            if (it == compact) return@forEach
             val ccolor = it.color() ?: return@forEach
             newComponent = newComponent.append(it.color(color(ccolor))) // No way I cooked this...
         }

@@ -13,7 +13,7 @@ private fun mul(str: String, times: Int): String {
     return result
 }
 
-class ProgressBarSignal(var progress: Float = 0f) : Signal<Float> {
+class ProgressBarSignal(var progress: Float) : Signal<Float> {
     override val hooks: MutableList<() -> Unit> = mutableListOf()
     override fun addHook(hook: () -> Unit) {
         hooks.add(hook)
@@ -23,6 +23,7 @@ class ProgressBarSignal(var progress: Float = 0f) : Signal<Float> {
 
     override fun value(value: Float) {
         progress = value
+        hooks.forEach { it() }
     }
 
     fun make(
@@ -40,11 +41,8 @@ class ProgressBarSignal(var progress: Float = 0f) : Signal<Float> {
 
 }
 
-fun progressBar(): ProgressBarSignal {
-    return ProgressBarSignal()
-}
-
-fun progressBar(default: Float): ProgressBarSignal {
+fun progressBar(default: Float = 0f): ProgressBarSignal {
     return ProgressBarSignal(default)
 }
+
 
