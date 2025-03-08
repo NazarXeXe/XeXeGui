@@ -3,14 +3,23 @@ package me.nazarxexe.ui.testing
 import me.nazarxexe.ui.*
 import me.nazarxexe.ui.route.gui
 import me.nazarxexe.ui.route.subroute
+import me.nazarxexe.ui.signals.Signal
+import me.nazarxexe.ui.signals.proxiedSignal
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.incendo.cloud.annotations.Command
+import java.util.concurrent.ThreadLocalRandom
 
 object BasicUICommand {
+
+    interface MyInterface {
+        var hello: Int
+        var yo: String
+    }
+    class MyDataClass(override var hello: Int, override var yo: String): MyInterface
 
     @Command("xexeuitest simple")
     fun simpleGui(sender: CommandSender) {
@@ -27,6 +36,37 @@ object BasicUICommand {
                     val item = ItemStack(Material.REDSTONE)
                     val mat = item.itemMeta ?: error("Air")
                     mat.displayName(Component.text(count))
+                    item.itemMeta = mat
+                    item
+                }
+            }
+        }
+
+        GuiHandle.openTo(sender, gui)
+    }
+
+    @Command("xexeuitest proxiedState")
+    fun proxy(sender: CommandSender) {
+        if (sender !is Player) return
+        val gui = gui {
+            click { it.isCancelled = true }
+
+            component(0) {
+                val myState by single<Signal<MyInterface>, MyInterface>(proxiedSignal(MyDataClass(0, "YOOO")))
+                button {
+                    myState.hello = ThreadLocalRandom.current().nextInt()
+                    myState.yo = "${ThreadLocalRandom.current().nextInt()} ${ThreadLocalRandom.current().nextInt()} __!"
+                }
+                render {
+                    val item = ItemStack(Material.REDSTONE)
+                    val mat = item.itemMeta ?: error("Air")
+                    mat.displayName(Component.text("MyState"))
+                    mat.lore(
+                        listOf(
+                                Component.text("Hello: ${myState.hello}"),
+                                Component.text("Yo: ${myState.yo}")
+                            )
+                    )
                     item.itemMeta = mat
                     item
                 }
