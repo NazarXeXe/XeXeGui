@@ -50,6 +50,7 @@ class ProxiedSignal<T>(
     override fun value(value: T) {
         default = value
         if (default != null) proxy()
+        hooks.forEach { it() }
     }
 }
 
